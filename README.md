@@ -6,6 +6,7 @@ Protoype Raft Consensus Algorithm in Scala
 
 - You need sbt to build and run project
 
-```
+```bash
 cd src
 sbt run
+```
