@@ -11,6 +11,5 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 - You need sbt to build and run project
 
 ```bash
-cd src
 sbt run
 ```
