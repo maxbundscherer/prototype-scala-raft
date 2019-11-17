@@ -1,3 +1,5 @@
+target/
+.idea/
 *.class
 *.log
-.idea/
+.DS_Store
