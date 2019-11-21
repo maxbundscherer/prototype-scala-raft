@@ -2,7 +2,7 @@ package de.maxbundscherer.scala.raft.services
 
 import akka.actor.{ActorRef, ActorSystem}
 
-class PingPongService()(actorSystem: ActorSystem) {
+class PingPongService()(implicit actorSystem: ActorSystem) {
 
   import de.maxbundscherer.scala.raft.actors.PingPongActor
   import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
