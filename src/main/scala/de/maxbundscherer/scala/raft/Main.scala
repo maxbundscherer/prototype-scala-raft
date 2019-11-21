@@ -1,9 +1,10 @@
 package de.maxbundscherer.scala.raft
 
 import akka.actor.ActorSystem
-import de.maxbundscherer.scala.raft.services.PingPongService
 
 object Main extends App {
+
+  import de.maxbundscherer.scala.raft.services._
 
   private implicit val actorSystem: ActorSystem = ActorSystem("system")
 
