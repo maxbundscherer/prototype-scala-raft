@@ -1,24 +1,24 @@
 package de.maxbundscherer.scala.raft.utils
 
+import de.maxbundscherer.scala.raft.services.PingPongService
+
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.duration._
 import org.scalatest.{AsyncFlatSpec, Matchers}
 
-class BaseServiceTest() extends AsyncFlatSpec with Matchers {
+object BaseServiceTest {
 
-  import de.maxbundscherer.scala.raft.services._
+  private lazy implicit val actorSystem: ActorSystem = ActorSystem("testSystem")
 
-  private object BaseService {
+  private lazy implicit val timeout: Timeout = 15.seconds
 
-    private lazy implicit val actorSystem: ActorSystem = ActorSystem("testSystem")
+  private lazy val pingPongService = new PingPongService()
 
-    private lazy implicit val timeout: Timeout = 15.seconds
+}
 
-    lazy val pingPongService = new PingPongService()
+trait BaseServiceTest extends AsyncFlatSpec with Matchers {
 
-  }
-
-  lazy val pingPongService: PingPongService = BaseService.pingPongService
+  val pingPongService: PingPongService = BaseServiceTest.pingPongService
 
 }
