@@ -6,6 +6,8 @@
 
 ![](https://github.com/maxbundscherer/prototype-scala-raft/.github/workflows/ci-tests.yml/badge.svg)
 
+![CI-Tests](https://github.com/maxbundscherer/prototype-scala-raft/workflows/ci-tests/badge.svg)
+
 Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ## Let´s get started
