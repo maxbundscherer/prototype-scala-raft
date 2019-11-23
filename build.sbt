@@ -11,6 +11,8 @@ libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Tes
 val scalaTestVersion = "3.0.8"
 libraryDependencies += "org.scalactic" %% "scalactic" % scalaTestVersion
 libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+logBuffered in Test := false //Disable buffered logs in test
+parallelExecution in Test := false //Run suites sequentially
 
 //Logger
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
