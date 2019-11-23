@@ -6,11 +6,16 @@ class SecondSampleTest extends BaseServiceTest {
 
   import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
 
-  "PingPongServiceSecond" should "pongSecond" in {
+  "PingPongServiceSecond" should {
 
-    pingPongService.ping("msg2").map(res =>
-      res shouldBe( Pong("msg2-pong") )
-    )
+    "pongSecond" in {
+
+      pingPongService.ping("msgSecond")
+        .map(
+          res => res shouldBe Pong("msgSecond-pong")
+        )
+
+    }
 
   }
 

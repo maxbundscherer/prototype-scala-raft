@@ -5,7 +5,7 @@ import de.maxbundscherer.scala.raft.services.PingPongService
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.duration._
-import org.scalatest.{AsyncFlatSpec, Matchers}
+import org.scalatest.{AsyncWordSpec, Matchers}
 
 object BaseServiceTest {
 
@@ -17,7 +17,7 @@ object BaseServiceTest {
 
 }
 
-trait BaseServiceTest extends AsyncFlatSpec with Matchers {
+trait BaseServiceTest extends AsyncWordSpec with Matchers {
 
   val pingPongService: PingPongService = BaseServiceTest.pingPongService
 
