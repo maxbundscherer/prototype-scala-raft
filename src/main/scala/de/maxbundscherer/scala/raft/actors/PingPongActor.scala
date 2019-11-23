@@ -29,7 +29,7 @@ class PingPongActor extends Actor with ActorLogging {
    */
   private def processRequest(req: Request): Unit = req match {
 
-    case Ping(msg) => tellSender( Pong(msg) )
+    case Ping(msg) => tellSender( Pong(s"$msg-pong") )
 
   }
 
