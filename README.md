@@ -8,8 +8,7 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ## Let´s get started
 
-- You need sbt to build and run project
+- You need [https://www.scala-sbt.org/](sbt) to build and run project
 
-```bash
-sbt run
-```
+- Run: ``sbt run``
+- Test: ``sbt test``

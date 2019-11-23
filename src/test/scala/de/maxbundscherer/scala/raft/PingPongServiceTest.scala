@@ -9,7 +9,7 @@ class PingPongServiceTest extends BaseServiceTest {
   "PingPongService" should "pong" in {
 
     pingPongService.ping("msg").map(res =>
-      res shouldBe( Pong("msg-pon") )
+      res shouldBe( Pong("msg-pong") )
     )
 
   }
