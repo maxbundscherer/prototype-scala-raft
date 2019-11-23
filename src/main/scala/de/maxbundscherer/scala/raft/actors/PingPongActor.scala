@@ -13,13 +13,13 @@ class PingPongActor extends Actor with ActorLogging {
 
   import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
 
-  log.info("Actor online!")
+  log.debug("Actor online!")
 
   override def receive: Receive = {
 
     case req: Request =>
 
-      log.info(s"Got request ($req)")
+      log.debug(s"Got request '$req'")
 
       req match {
         case Ping(msg) => tellSender( Pong(msg) )
@@ -27,7 +27,7 @@ class PingPongActor extends Actor with ActorLogging {
 
     case any: Any =>
 
-      log.warning(s"Got unhandled request ($any)")
+      log.warning(s"Got unhandled request '$any'")
 
   }
 
