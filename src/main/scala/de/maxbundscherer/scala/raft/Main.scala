@@ -11,7 +11,7 @@ object Main extends App {
 
   private implicit val actorSystem: ActorSystem = ActorSystem("system")
   private implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
-  private implicit val timeout: Timeout = 10.seconds
+  private implicit val timeout: Timeout = 15.seconds
 
   private val log = actorSystem.log
 
