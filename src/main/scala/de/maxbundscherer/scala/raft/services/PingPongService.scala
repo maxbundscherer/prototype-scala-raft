@@ -10,6 +10,9 @@ class PingPongService()(implicit actorSystem: ActorSystem, timeout: Timeout) {
   import de.maxbundscherer.scala.raft.actors.PingPongActor
   import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
 
+  /**
+   * Private actor ref (use proxy in cluster)
+   */
   private val actor: ActorRef = actorSystem.actorOf( PingPongActor.props, PingPongActor.prefix + "0" )
 
   /**

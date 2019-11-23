@@ -15,11 +15,15 @@ class PingPongActor extends Actor with ActorLogging {
 
   log.debug("Actor online")
 
+  /**
+   * Default behavior
+   * @return Receive
+   */
   override def receive: Receive = {
 
     case req: Request => processRequest(req)
 
-    case any: Any => log.warning(s"Got unhandled request '$any'")
+    case any: Any => log.warning(s"Got unhandled message '$any'")
 
   }
 

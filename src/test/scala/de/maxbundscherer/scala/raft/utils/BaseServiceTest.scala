@@ -11,7 +11,7 @@ class BaseServiceTest() extends AsyncFlatSpec with Matchers {
 
   private object BaseService {
 
-    private lazy implicit val actorSystem: ActorSystem = ActorSystem("system")
+    private lazy implicit val actorSystem: ActorSystem = ActorSystem("testSystem")
 
     private lazy implicit val timeout: Timeout = 15.seconds
 
