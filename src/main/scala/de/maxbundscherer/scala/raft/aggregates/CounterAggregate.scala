@@ -5,7 +5,10 @@ object CounterAggregate {
   trait Request
   trait Response
 
-  case class Ping(msg: String) extends Request
-  case class Pong(msg: String) extends Response
+  case class Reset()                extends Request
+  case class Increment(value: Int)  extends Request
+  case class Decrement(value: Int)  extends Request
+
+  case class NewValue(value: Int)   extends Response
 
 }

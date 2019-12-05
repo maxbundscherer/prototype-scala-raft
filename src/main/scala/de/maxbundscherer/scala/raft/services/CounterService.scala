@@ -25,6 +25,8 @@ class CounterService()(implicit actorSystem: ActorSystem, timeout: Timeout) {
   private def askActor[RequestType, ResponseType](req: RequestType): Future[ResponseType] =
     (actor ? req).asInstanceOf[Future[ResponseType]]
 
-  def ping(msg: String): Future[Pong] = askActor[Ping, Pong]( Ping(msg) )
+  def reset()               : Future[NewValue] = askActor[Reset, NewValue]    ( Reset() )
+  def increment(value: Int) : Future[NewValue] = askActor[Increment, NewValue]( Increment(value) )
+  def decrement(value: Int) : Future[NewValue] = askActor[Decrement, NewValue]( Decrement(value) )
 
 }

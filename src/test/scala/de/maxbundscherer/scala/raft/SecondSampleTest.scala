@@ -8,13 +8,25 @@ class SecondSampleTest extends BaseServiceTest {
 
   "CounterServiceSecond" should {
 
-    "pongSecond" in {
-
-      counterService.ping("msgSecond")
+    "reset" in {
+      counterService.reset()
         .map(
-          res => res shouldBe Pong("msgSecond-pong")
+          response => response shouldBe NewValue(0)
         )
+    }
 
+    "increment" in {
+      counterService.increment(4)
+        .map(
+          response => response shouldBe NewValue(4)
+        )
+    }
+
+    "decrement" in {
+      counterService.decrement(2)
+        .map(
+          response => response shouldBe NewValue(2)
+        )
     }
 
   }

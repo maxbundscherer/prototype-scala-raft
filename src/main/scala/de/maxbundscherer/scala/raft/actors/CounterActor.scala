@@ -7,7 +7,13 @@ object CounterActor {
   val prefix: String = "counterActor"
   def props: Props   = Props(new CounterActor())
 
-  case class CounterState()
+  case class CounterState(balance: Int = 0) {
+
+    def reset()               : CounterState = copy(balance = 0)
+    def increment(value: Int) : CounterState = copy(balance = balance + value)
+    def decrement(value: Int) : CounterState = copy(balance = balance - value)
+
+  }
 
 }
 
@@ -41,9 +47,20 @@ class CounterActor extends Actor with ActorLogging {
    */
   private def processRequest(req: Request): Unit = req match {
 
-    case Ping(msg) =>
+    case Reset() =>
 
-      tellSender( Pong(s"$msg-pong") )
+      this.state = this.state.reset()
+      tellSender( NewValue(this.state.balance) )
+
+    case Increment(value) =>
+
+      this.state = this.state increment value
+      tellSender( NewValue(this.state.balance) )
+
+    case Decrement(value) =>
+
+      this.state = this.state decrement value
+      tellSender( NewValue(this.state.balance) )
 
     case any: Any => log.error(s"Got unhandled request '$any'")
 

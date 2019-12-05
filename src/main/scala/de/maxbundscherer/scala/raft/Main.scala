@@ -17,9 +17,17 @@ object Main extends App {
 
   private val counterService = new CounterService()
 
-  counterService.ping("test")
-    .map(
-      p => log.info(s"Got response '$p'")
-    )
+  counterService.reset().map(response =>
+    log.info(s"Got response from reset '$response'")
+  )
+
+  counterService.increment(5).map(response =>
+    log.info(s"Got response from increment '$response'")
+  )
+
+  counterService.decrement(4).map(response => {
+    log.info(s"Got response from decrement '$response'")
+    actorSystem.terminate()
+  })
 
 }
