@@ -15,9 +15,9 @@ object Main extends App {
 
   private val log = actorSystem.log
 
-  private val pingPongService = new PingPongService()
+  private val counterService = new CounterService()
 
-  pingPongService.ping("test")
+  counterService.ping("test")
     .map(
       p => log.info(s"Got response '$p'")
     )

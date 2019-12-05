@@ -5,15 +5,15 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import scala.concurrent.Future
 
-class PingPongService()(implicit actorSystem: ActorSystem, timeout: Timeout) {
+class CounterService()(implicit actorSystem: ActorSystem, timeout: Timeout) {
 
-  import de.maxbundscherer.scala.raft.actors.PingPongActor
-  import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
+  import de.maxbundscherer.scala.raft.actors.CounterActor
+  import de.maxbundscherer.scala.raft.aggregates.CounterAggregate._
 
   /**
    * Private actor ref (use proxy in cluster)
    */
-  private val actor: ActorRef = actorSystem.actorOf( PingPongActor.props, PingPongActor.prefix + "0" )
+  private val actor: ActorRef = actorSystem.actorOf( CounterActor.props, CounterActor.prefix + "0" )
 
   /**
    * Ask internal actor

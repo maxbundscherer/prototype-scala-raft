@@ -1,6 +1,6 @@
 package de.maxbundscherer.scala.raft.aggregates
 
-object PingPongAggregate {
+object CounterAggregate {
 
   trait Request
   trait Response

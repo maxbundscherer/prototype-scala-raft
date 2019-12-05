@@ -2,24 +2,24 @@ package de.maxbundscherer.scala.raft.actors
 
 import akka.actor.{Actor, ActorLogging, Props}
 
-object PingPongActor {
+object CounterActor {
 
-  val prefix: String = "pingPongActor"
-  def props: Props   = Props(new PingPongActor())
+  val prefix: String = "counterActor"
+  def props: Props   = Props(new CounterActor())
 
-  case class PingPongState()
+  case class CounterState()
 
 }
 
-class PingPongActor extends Actor with ActorLogging {
+class CounterActor extends Actor with ActorLogging {
 
-  import PingPongActor._
-  import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
+  import CounterActor._
+  import de.maxbundscherer.scala.raft.aggregates.CounterAggregate._
 
   /**
    * Mutable actor state
    */
-  private var state = PingPongState()
+  private var state = CounterState()
 
   log.debug("Actor online")
 

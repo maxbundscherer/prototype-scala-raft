@@ -2,15 +2,15 @@ package de.maxbundscherer.scala.raft
 
 import de.maxbundscherer.scala.raft.utils.BaseServiceTest
 
-class PingPongServiceTest extends BaseServiceTest {
+class CounterServiceTest extends BaseServiceTest {
 
-  import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
+  import de.maxbundscherer.scala.raft.aggregates.CounterAggregate._
 
-  "PingPongService" should {
+  "CounterService" should {
 
     "pong" in {
 
-      pingPongService.ping("msg")
+      counterService.ping("msg")
         .map(
           res => res shouldBe Pong("msg-pong")
         )

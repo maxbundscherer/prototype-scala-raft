@@ -1,6 +1,6 @@
 package de.maxbundscherer.scala.raft.utils
 
-import de.maxbundscherer.scala.raft.services.PingPongService
+import de.maxbundscherer.scala.raft.services.CounterService
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
@@ -13,12 +13,12 @@ object BaseServiceTest {
 
   private lazy implicit val timeout: Timeout = 15.seconds
 
-  private lazy val pingPongService = new PingPongService()
+  private lazy val counterService = new CounterService()
 
 }
 
 trait BaseServiceTest extends AsyncWordSpec with Matchers {
 
-  val pingPongService: PingPongService = BaseServiceTest.pingPongService
+  val counterService: CounterService = BaseServiceTest.counterService
 
 }
