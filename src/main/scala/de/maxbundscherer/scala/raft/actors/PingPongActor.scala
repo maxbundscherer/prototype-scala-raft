@@ -7,11 +7,19 @@ object PingPongActor {
   val prefix: String = "pingPongActor"
   def props: Props   = Props(new PingPongActor())
 
+  case class PingPongState()
+
 }
 
 class PingPongActor extends Actor with ActorLogging {
 
+  import PingPongActor._
   import de.maxbundscherer.scala.raft.aggregates.PingPongAggregate._
+
+  /**
+   * Mutable actor state
+   */
+  private var state = PingPongState()
 
   log.debug("Actor online")
 
