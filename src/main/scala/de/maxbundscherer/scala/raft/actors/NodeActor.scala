@@ -7,12 +7,9 @@ object NodeActor {
   val prefix: String  = "nodeActor"
   def props: Props    = Props(new NodeActor())
 
-  private case class NodeState(neighbours: Vector[ActorRef] = Vector.empty) {
-
-    def initNeighbours(neighbours: Vector[ActorRef]): NodeState =
-      copy(neighbours = neighbours)
-
-  }
+  private case class NodeState(
+      var neighbours: Vector[ActorRef] = Vector.empty
+  )
 
 }
 
@@ -31,28 +28,35 @@ class NodeActor extends Actor with ActorLogging {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
+  import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.BehaviorEnum.BehaviorEnum
 
   /**
     * Mutable actor state
     */
-  private var state = NodeState()
+  private val state = NodeState()
 
   log.debug("Actor online (uninitialized)")
 
   /**
-    * Change actor behavior
-    * @param fromBehaviorLabel String (logging)
-    * @param toBehaviorLabel String (logging)
-    * @param toBehavior Behavior
-    * @param loggerMessage String (logging)
-    */
-  private def changeBehavior(fromBehaviorLabel: String,
-                             toBehaviorLabel: String,
-                             toBehavior: Receive,
+   * Change actor behavior
+   * @param fromBehavior Behavior
+   * @param toBehavior Behavior
+   * @param loggerMessage String (logging)
+   */
+  private def changeBehavior(fromBehavior: BehaviorEnum,
+                             toBehavior: BehaviorEnum,
                              loggerMessage: String): Unit = {
 
-    log.debug(s"Change behavior from '$fromBehaviorLabel' to '$toBehaviorLabel' ($loggerMessage)")
-    this.context.become(toBehavior)
+    log.debug(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
+
+    val newBehavior: Receive = toBehavior match {
+      case BehaviorEnum.FOLLOWER      => this.followerBehavior
+      case BehaviorEnum.CANDIDATE     => this.candidateBehavior
+      case BehaviorEnum.LEADER        => this.followerBehavior
+      case _                          => this.receive
+    }
+
+    this.context.become(newBehavior)
 
   }
 
@@ -63,12 +67,11 @@ class NodeActor extends Actor with ActorLogging {
 
     case InitActor(neighbours) =>
 
-      this.state = this.state initNeighbours neighbours
+      this.state.neighbours = neighbours
 
-      this.changeBehavior(fromBehaviorLabel = "uninitialized",
-                          toBehaviorLabel = "follower",
-                          toBehavior = followerBehavior,
-                          loggerMessage = s"Got ${neighbours.size} neighbours")
+      this.changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
+                          toBehavior = BehaviorEnum.FOLLOWER,
+                          loggerMessage = s"Got ${this.state.neighbours.size} neighbours")
 
     case _: Any => log.error("Node is not initialized")
 

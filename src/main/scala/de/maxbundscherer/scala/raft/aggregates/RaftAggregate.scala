@@ -9,4 +9,9 @@ object RaftAggregate {
 
   case class InitActor(neighbours: Vector[ActorRef]) extends Request
 
+  object BehaviorEnum extends Enumeration {
+    type BehaviorEnum = Value
+    val UNINITIALIZED, FOLLOWER, CANDIDATE, LEADER = Value
+  }
+
 }
