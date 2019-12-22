@@ -44,11 +44,11 @@ trait RaftScheduler extends Actor with ActorLogging {
     */
   def restartElectionTimeoutTimer(): Unit = {
 
-    this.stopElectionTimeoutTimer()
+    stopElectionTimeoutTimer()
 
     log.debug("Start ElectionTimeoutTimer")
 
-    this.state.electionTimeoutTimer = Some(
+    state.electionTimeoutTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
         initialDelay = electionTimeout.seconds,
         delay = electionTimeout.seconds,

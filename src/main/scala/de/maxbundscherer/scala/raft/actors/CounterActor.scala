@@ -49,18 +49,18 @@ class CounterActor extends Actor with ActorLogging {
 
     case Reset() =>
 
-      this.state = this.state.reset()
-      tellSender( NewValue(this.state.balance) )
+      state = state.reset()
+      tellSender( NewValue(state.balance) )
 
     case Increment(value) =>
 
-      this.state = this.state increment value
-      tellSender( NewValue(this.state.balance) )
+      state = state increment value
+      tellSender( NewValue(state.balance) )
 
     case Decrement(value) =>
 
-      this.state = this.state decrement value
-      tellSender( NewValue(this.state.balance) )
+      state = state decrement value
+      tellSender( NewValue(state.balance) )
 
     case any: Any => log.error(s"Got unhandled request '$any'")
 

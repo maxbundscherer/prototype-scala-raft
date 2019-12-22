@@ -60,25 +60,25 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
       case BehaviorEnum.FOLLOWER =>
 
         restartElectionTimeoutTimer()
-        this.followerBehavior
+        followerBehavior
 
       case BehaviorEnum.CANDIDATE =>
 
         stopElectionTimeoutTimer()
-        this.candidateBehavior
+        candidateBehavior
 
       case BehaviorEnum.LEADER =>
 
         stopElectionTimeoutTimer()
-        this.followerBehavior
+        followerBehavior
 
       case _ =>
 
         stopElectionTimeoutTimer()
-        this.receive
+        receive
     }
 
-    this.context.become(newBehavior)
+    context.become(newBehavior)
 
   }
 
@@ -89,11 +89,11 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
     case InitActor(neighbours) =>
 
-      this.state.neighbours = neighbours
+      state.neighbours = neighbours
 
-      this.changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
+      changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
                           toBehavior = BehaviorEnum.FOLLOWER,
-                          loggerMessage = s"Got ${this.state.neighbours.size} neighbours")
+                          loggerMessage = s"Got ${state.neighbours.size} neighbours")
 
     case _: Any => log.error("Node is not initialized")
 
