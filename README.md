@@ -7,7 +7,7 @@
 
 Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
-## Let´s get started
+## Let's get started
 
 - You need [sbt](https://www.scala-sbt.org/) to build and run project
 
