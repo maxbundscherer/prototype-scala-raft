@@ -25,5 +25,6 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem, timeout: 
     * Init nodes (each node with neighbors)
     */
   this.nodes.foreach(node =>
-    node._2 ! InitActor(this.nodes.filter(_._1 != node._1).values.toVector)
-  )
+    node._2 ! InitActor(this.nodes.filter(_._1 != node._1).values.toVector))
+
+}
