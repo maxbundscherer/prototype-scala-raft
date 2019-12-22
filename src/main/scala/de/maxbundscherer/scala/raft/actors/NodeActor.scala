@@ -55,30 +55,46 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
     log.info(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
 
+    /**
+      * Before change behavior
+      */
     val newBehavior: Receive = toBehavior match {
 
       case BehaviorEnum.FOLLOWER =>
-
         restartElectionTimeoutTimer()
         followerBehavior
 
       case BehaviorEnum.CANDIDATE =>
-
         stopElectionTimeoutTimer()
         candidateBehavior
 
       case BehaviorEnum.LEADER =>
-
         stopElectionTimeoutTimer()
         followerBehavior
 
       case _ =>
-
         stopElectionTimeoutTimer()
         receive
+
     }
 
+    /**
+      * Change behavior
+      */
     context.become(newBehavior)
+
+    /**
+      * After change behavior
+      */
+    toBehavior match {
+
+      case BehaviorEnum.CANDIDATE =>
+        state.neighbours.foreach(neighbour => neighbour ! RequestVote)
+        self ! GrantVote
+
+      case _ =>
+
+    }
 
   }
 
@@ -111,7 +127,6 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
                      loggerMessage = "ElectionTimeout")
 
     case any: Any =>
-
       log.warning(s"Got unhandled message in followerBehavior '$any'")
 
   }
@@ -122,7 +137,6 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
   def candidateBehavior: Receive = {
 
     case any: Any =>
-
       log.warning(s"Got unhandled message in candidateBehavior '$any'")
 
   }
@@ -133,7 +147,6 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
   def leaderBehavior: Receive = {
 
     case any: Any =>
-
       log.warning(s"Got unhandled message in leaderBehavior '$any'")
 
   }
