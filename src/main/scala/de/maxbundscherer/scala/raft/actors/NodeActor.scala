@@ -1,11 +1,18 @@
 package de.maxbundscherer.scala.raft.actors
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, Props, ActorRef}
 
 object NodeActor {
 
   val prefix: String  = "nodeActor"
   def props: Props    = Props(new NodeActor())
+
+  private case class NodeState(neighbours: Vector[ActorRef] = Vector.empty) {
+
+    def initNeighbours(neighbours: Vector[ActorRef]): NodeState =
+      copy(neighbours = neighbours)
+
+  }
 
 }
 
@@ -25,20 +32,49 @@ class NodeActor extends Actor with ActorLogging {
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
 
-  log.debug("Actor online")
+  /**
+   * Mutable actor state
+   */
+  private var state = NodeState()
+
+  log.debug("Actor online (uninitialized)")
 
   /**
-    * Set default behavior to FOLLOWER
+    * Change actor behavior
+    * @param fromBehaviorLabel String (logging)
+    * @param toBehaviorLabel String (logging)
+    * @param toBehavior Behavior
     */
-  override def receive: Receive = followerBehavior
+  private def changeBehavior(fromBehaviorLabel: String,
+                     toBehaviorLabel: String,
+                     toBehavior: Receive): Unit = {
+
+    log.debug(s"Change behavior from '$fromBehaviorLabel' to '$toBehaviorLabel'")
+    this.context.become(toBehavior)
+
+  }
+
+  /**
+    * Uninitialized behavior
+    */
+  override def receive: Receive = {
+
+    case InitActor(neighbours) =>
+
+      this.state = this.state initNeighbours neighbours
+
+      this.changeBehavior(fromBehaviorLabel = "uninitialized",
+                          toBehaviorLabel = "follower",
+                          toBehavior = followerBehavior)
+
+    case _: Any => log.error("Node is not initialized")
+
+  }
 
   /**
     * Raft FOLLOWER
     */
   def followerBehavior: Receive = {
-
-    case req: Request =>
-      log.warning(s"Got unhandled request in followerBehavior '$req'")
 
     case any: Any =>
       log.error(s"Got unhandled message in followerBehavior '$any'")
@@ -50,9 +86,6 @@ class NodeActor extends Actor with ActorLogging {
     */
   def candidateBehavior: Receive = {
 
-    case req: Request =>
-      log.warning(s"Got unhandled request in candidateBehavior '$req'")
-
     case any: Any =>
       log.error(s"Got unhandled message in candidateBehavior '$any'")
 
@@ -62,9 +95,6 @@ class NodeActor extends Actor with ActorLogging {
     * Raft LEADER
     */
   def leaderBehavior: Receive = {
-
-    case req: Request =>
-      log.warning(s"Got unhandled request in candidateBehavior '$req'")
 
     case any: Any =>
       log.error(s"Got unhandled message in leaderBehavior '$any'")

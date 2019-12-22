@@ -11,15 +11,19 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem, timeout: 
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
 
   /**
-   * Declare nodes
-   */
-  final val nodes: Array[ActorRef] = new Array[ActorRef](numberNodes)
+    * Declare and start up nodes
+    */
+  final val nodes: Map[Int, ActorRef] =
+    (0 until numberNodes)
+      .map(i => {
+        i -> actorSystem.actorOf(props = NodeActor.props,
+                                 name = s"${NodeActor.prefix}-$i")
+      })
+      .toMap
 
   /**
-   * Start nodes
-   */
-  for (i <- 0 until numberNodes)
-    nodes(i) = actorSystem.actorOf(props = NodeActor.props,
-                                   name = s"${NodeActor.prefix}-$i")
-
-}
+    * Init nodes (each node with neighbors)
+    */
+  this.nodes.foreach(node =>
+    node._2 ! InitActor(this.nodes.filter(_._1 != node._1).values.toVector)
+  )
