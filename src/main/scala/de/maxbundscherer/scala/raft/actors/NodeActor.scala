@@ -7,31 +7,32 @@ import akka.actor.Actor
  * --- Raft Node ----
  * ------------------
  *
- * # 3 Behaviors
+ * # 3 Behaviors (Finite-state machine)
+ *
  * - FOLLOWER (Default)
  * - LEADER
  * - CANDIDATE
  */
-class RaftNode extends Actor {
+class NodeActor extends Actor {
 
   /**
    * Set default behavior to FOLLOWER
    */
-  override def receive: Receive = behaviorFollower
+  override def receive: Receive = followerBehavior
 
   /**
    * Raft FOLLOWER
    */
-  def behaviorFollower: Receive = ???
+  def followerBehavior: Receive = ???
 
   /**
    * Raft CANDIDATE
    */
-  def behaviorCandidate: Receive = ???
+  def candidateBehavior: Receive = ???
 
   /**
    * Raft LEADER
    */
-  def behaviorLeader: Receive = ???
+  def leaderBehavior: Receive = ???
 
 }
