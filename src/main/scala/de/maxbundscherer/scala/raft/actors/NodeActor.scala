@@ -92,8 +92,8 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
       state.neighbours = neighbours
 
       changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
-                          toBehavior = BehaviorEnum.FOLLOWER,
-                          loggerMessage = s"Got ${state.neighbours.size} neighbours")
+                     toBehavior = BehaviorEnum.FOLLOWER,
+                     loggerMessage = s"Got ${state.neighbours.size} neighbours")
 
     case _: Any => log.error("Node is not initialized")
 
