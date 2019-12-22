@@ -33,8 +33,8 @@ class NodeActor extends Actor with ActorLogging {
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
 
   /**
-   * Mutable actor state
-   */
+    * Mutable actor state
+    */
   private var state = NodeState()
 
   log.debug("Actor online (uninitialized)")
@@ -44,12 +44,14 @@ class NodeActor extends Actor with ActorLogging {
     * @param fromBehaviorLabel String (logging)
     * @param toBehaviorLabel String (logging)
     * @param toBehavior Behavior
+    * @param loggerMessage String (logging)
     */
   private def changeBehavior(fromBehaviorLabel: String,
-                     toBehaviorLabel: String,
-                     toBehavior: Receive): Unit = {
+                             toBehaviorLabel: String,
+                             toBehavior: Receive,
+                             loggerMessage: String): Unit = {
 
-    log.debug(s"Change behavior from '$fromBehaviorLabel' to '$toBehaviorLabel'")
+    log.debug(s"Change behavior from '$fromBehaviorLabel' to '$toBehaviorLabel' ($loggerMessage)")
     this.context.become(toBehavior)
 
   }
@@ -65,7 +67,8 @@ class NodeActor extends Actor with ActorLogging {
 
       this.changeBehavior(fromBehaviorLabel = "uninitialized",
                           toBehaviorLabel = "follower",
-                          toBehavior = followerBehavior)
+                          toBehavior = followerBehavior,
+                          loggerMessage = s"Got ${neighbours.size} neighbours")
 
     case _: Any => log.error("Node is not initialized")
 
