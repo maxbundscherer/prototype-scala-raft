@@ -14,4 +14,8 @@ object RaftAggregate {
     val UNINITIALIZED, FOLLOWER, CANDIDATE, LEADER = Value
   }
 
+  object SchedulerTrigger {
+    object ElectionTimeout
+  }
+
 }

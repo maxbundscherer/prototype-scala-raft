@@ -1,14 +1,18 @@
 package de.maxbundscherer.scala.raft.actors
 
-import akka.actor.{Actor, ActorLogging, Props, ActorRef}
+import de.maxbundscherer.scala.raft.utils.RaftScheduler
+import akka.actor.{Actor, ActorLogging, ActorRef}
 
 object NodeActor {
 
-  val prefix: String  = "nodeActor"
-  def props: Props    = Props(new NodeActor())
+  import akka.actor.{Cancellable, Props}
 
-  private case class NodeState(
-      var neighbours: Vector[ActorRef] = Vector.empty
+  val prefix  : String  = "nodeActor"
+  def props   : Props   = Props(new NodeActor())
+
+  case class NodeState(
+      var neighbours            : Vector[ActorRef]    = Vector.empty,
+      var electionTimeoutTimer  : Option[Cancellable] = None
   )
 
 }
@@ -24,25 +28,27 @@ object NodeActor {
   * - LEADER
   * - CANDIDATE
   */
-class NodeActor extends Actor with ActorLogging {
+class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.BehaviorEnum.BehaviorEnum
+  import scala.concurrent.ExecutionContext
 
   /**
     * Mutable actor state
     */
-  private val state = NodeState()
+  override val state = NodeState()
+  override implicit val executionContext: ExecutionContext = context.system.dispatcher
 
   log.debug("Actor online (uninitialized)")
 
   /**
-   * Change actor behavior
-   * @param fromBehavior Behavior
-   * @param toBehavior Behavior
-   * @param loggerMessage String (logging)
-   */
+    * Change actor behavior
+    * @param fromBehavior Behavior
+    * @param toBehavior Behavior
+    * @param loggerMessage String (logging)
+    */
   private def changeBehavior(fromBehavior: BehaviorEnum,
                              toBehavior: BehaviorEnum,
                              loggerMessage: String): Unit = {
@@ -50,10 +56,26 @@ class NodeActor extends Actor with ActorLogging {
     log.debug(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
 
     val newBehavior: Receive = toBehavior match {
-      case BehaviorEnum.FOLLOWER      => this.followerBehavior
-      case BehaviorEnum.CANDIDATE     => this.candidateBehavior
-      case BehaviorEnum.LEADER        => this.followerBehavior
-      case _                          => this.receive
+
+      case BehaviorEnum.FOLLOWER =>
+
+        restartElectionTimeoutTimer()
+        this.followerBehavior
+
+      case BehaviorEnum.CANDIDATE =>
+
+        stopElectionTimeoutTimer()
+        this.candidateBehavior
+
+      case BehaviorEnum.LEADER =>
+
+        stopElectionTimeoutTimer()
+        this.followerBehavior
+
+      case _ =>
+
+        stopElectionTimeoutTimer()
+        this.receive
     }
 
     this.context.become(newBehavior)
@@ -83,6 +105,7 @@ class NodeActor extends Actor with ActorLogging {
   def followerBehavior: Receive = {
 
     case any: Any =>
+
       log.error(s"Got unhandled message in followerBehavior '$any'")
 
   }
@@ -93,6 +116,7 @@ class NodeActor extends Actor with ActorLogging {
   def candidateBehavior: Receive = {
 
     case any: Any =>
+
       log.error(s"Got unhandled message in candidateBehavior '$any'")
 
   }
@@ -103,6 +127,7 @@ class NodeActor extends Actor with ActorLogging {
   def leaderBehavior: Receive = {
 
     case any: Any =>
+
       log.error(s"Got unhandled message in leaderBehavior '$any'")
 
   }

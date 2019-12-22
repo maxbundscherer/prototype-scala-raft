@@ -13,3 +13,10 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 - Run: ``sbt run``
 - Test: ``sbt test``
+
+## Talk about ...
+
+- ... enums in scala
+- ... typed akka actors (and service layer alternative)
+- ... fsm in akka actor
+- ... difference between ``scheduleWithFixedDelay`` and ``scheduleAtFixedRate`` in akka
