@@ -70,7 +70,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
       case BehaviorEnum.LEADER =>
         stopElectionTimeoutTimer()
-        followerBehavior
+        leaderBehavior
 
       case _ =>
         stopElectionTimeoutTimer()
@@ -127,7 +127,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
                      loggerMessage = "ElectionTimeout")
 
     case any: Any =>
-      log.warning(s"Got unhandled message in followerBehavior '$any'")
+      log.warning(s"Got unhandled message in followerBehavior '${any.getClass.getSimpleName}'")
 
   }
 
@@ -137,7 +137,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
   def candidateBehavior: Receive = {
 
     case any: Any =>
-      log.warning(s"Got unhandled message in candidateBehavior '$any'")
+      log.warning(s"Got unhandled message in candidateBehavior '${any.getClass.getSimpleName}'")
 
   }
 
@@ -147,14 +147,8 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
   def leaderBehavior: Receive = {
 
     case any: Any =>
-      log.warning(s"Got unhandled message in leaderBehavior '$any'")
+      log.warning(s"Got unhandled message in leaderBehavior '${any.getClass.getSimpleName}'")
 
   }
-
-  /**
-    * Tell sender (fire and forget)
-    * @param res Response
-    */
-  private def tellSender(res: Response): Unit = { sender ! res }
 
 }
