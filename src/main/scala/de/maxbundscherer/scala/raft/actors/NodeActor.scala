@@ -23,6 +23,7 @@ object NodeActor {
 class NodeActor extends Actor with ActorLogging {
 
   import NodeActor._
+  import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
 
   log.debug("Actor online")
 
@@ -36,6 +37,9 @@ class NodeActor extends Actor with ActorLogging {
     */
   def followerBehavior: Receive = {
 
+    case req: Request =>
+      log.warning(s"Got unhandled request in followerBehavior '$req'")
+
     case any: Any =>
       log.error(s"Got unhandled message in followerBehavior '$any'")
 
@@ -45,6 +49,9 @@ class NodeActor extends Actor with ActorLogging {
     * Raft CANDIDATE
     */
   def candidateBehavior: Receive = {
+
+    case req: Request =>
+      log.warning(s"Got unhandled request in candidateBehavior '$req'")
 
     case any: Any =>
       log.error(s"Got unhandled message in candidateBehavior '$any'")
@@ -56,9 +63,18 @@ class NodeActor extends Actor with ActorLogging {
     */
   def leaderBehavior: Receive = {
 
+    case req: Request =>
+      log.warning(s"Got unhandled request in candidateBehavior '$req'")
+
     case any: Any =>
       log.error(s"Got unhandled message in leaderBehavior '$any'")
 
   }
+
+  /**
+    * Tell sender (fire and forget)
+    * @param res Response
+    */
+  private def tellSender(res: Response): Unit = { sender ! res }
 
 }
