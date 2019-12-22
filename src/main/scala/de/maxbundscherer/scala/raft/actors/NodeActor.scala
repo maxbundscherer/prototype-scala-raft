@@ -112,7 +112,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
     case any: Any =>
 
-      log.error(s"Got unhandled message in followerBehavior '$any'")
+      log.warning(s"Got unhandled message in followerBehavior '$any'")
 
   }
 
@@ -123,7 +123,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
     case any: Any =>
 
-      log.error(s"Got unhandled message in candidateBehavior '$any'")
+      log.warning(s"Got unhandled message in candidateBehavior '$any'")
 
   }
 
@@ -134,7 +134,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
     case any: Any =>
 
-      log.error(s"Got unhandled message in leaderBehavior '$any'")
+      log.warning(s"Got unhandled message in leaderBehavior '$any'")
 
   }
 
