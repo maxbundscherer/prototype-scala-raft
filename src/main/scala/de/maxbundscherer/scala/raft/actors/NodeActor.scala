@@ -41,7 +41,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
   override val state = NodeState()
   override implicit val executionContext: ExecutionContext = context.system.dispatcher
 
-  log.debug("Actor online (uninitialized)")
+  log.info("Actor online (uninitialized)")
 
   /**
     * Change actor behavior
@@ -53,7 +53,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
                              toBehavior: BehaviorEnum,
                              loggerMessage: String): Unit = {
 
-    log.debug(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
+    log.info(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
 
     val newBehavior: Receive = toBehavior match {
 
@@ -103,6 +103,12 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
     * Raft FOLLOWER
     */
   def followerBehavior: Receive = {
+
+    case SchedulerTrigger.ElectionTimeout =>
+
+      changeBehavior(fromBehavior = BehaviorEnum.FOLLOWER,
+                     toBehavior = BehaviorEnum.CANDIDATE,
+                     loggerMessage = "ElectionTimeout")
 
     case any: Any =>
 

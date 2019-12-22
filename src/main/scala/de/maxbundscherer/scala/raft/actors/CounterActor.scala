@@ -27,7 +27,7 @@ class CounterActor extends Actor with ActorLogging {
    */
   private var state = CounterState()
 
-  log.debug("Actor online")
+  log.info("Actor online")
 
   /**
    * Default behavior
