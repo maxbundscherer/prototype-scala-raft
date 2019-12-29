@@ -25,7 +25,7 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
 
     "elect only one leader" in {
 
-      freezeTest(seconds = 20, loggerMessage = "Waiting for first leader election")
+      freezeTest(seconds = Config.nodes * 2, loggerMessage = "Waiting for first leader election")
 
       val data: Vector[Either[IamTheLeader, IamNotTheLeader]] = raftService.evaluateActualLeaders
 
@@ -57,7 +57,7 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
 
     "elect new leader after leader crash" in {
 
-      freezeTest(seconds = 20, loggerMessage = "Waiting for second leader election")
+      freezeTest(seconds = Config.nodes * 2, loggerMessage = "Waiting for second leader election")
 
       val data: Vector[Either[IamTheLeader, IamNotTheLeader]] = raftService.evaluateActualLeaders
 
