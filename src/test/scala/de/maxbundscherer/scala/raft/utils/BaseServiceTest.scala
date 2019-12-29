@@ -1,24 +1,25 @@
 package de.maxbundscherer.scala.raft.utils
 
-import de.maxbundscherer.scala.raft.services.CounterService
-
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import scala.concurrent.duration._
+import de.maxbundscherer.scala.raft.services.RaftService
 import org.scalatest.{AsyncWordSpec, Matchers}
 
-object BaseServiceTest {
+object BaseServiceTest extends Configuration {
 
-  private lazy implicit val actorSystem: ActorSystem = ActorSystem("testSystem")
+  import akka.actor.ActorSystem
+  import scala.concurrent.ExecutionContextExecutor
+  import scala.concurrent.duration._
+  import akka.util.Timeout
 
-  private lazy implicit val timeout: Timeout = 15.seconds
+  private implicit val actorSystem: ActorSystem = ActorSystem("testSystem")
+  private implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+  private implicit val timeout: Timeout = 15.seconds
 
-  private lazy val counterService = new CounterService()
+  private lazy val raftService = new RaftService(numberNodes = Config.nodes)
 
 }
 
 trait BaseServiceTest extends AsyncWordSpec with Matchers {
 
-  val counterService: CounterService = BaseServiceTest.counterService
+  val raftService: RaftService = BaseServiceTest.raftService
 
 }

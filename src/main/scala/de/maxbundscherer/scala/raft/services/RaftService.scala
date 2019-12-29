@@ -3,7 +3,7 @@ package de.maxbundscherer.scala.raft.services
 import akka.pattern.ask
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
                                     timeout: Timeout,
@@ -28,5 +28,10 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
     */
   nodes.foreach(node =>
     node._2 ! InitActor(nodes.filter(_._1 != node._1).values.toVector))
+
+  /**
+   * Terminates actor system
+   */
+  def terminate(): Future[Boolean] = actorSystem.terminate().map(_ => true)
 
 }
