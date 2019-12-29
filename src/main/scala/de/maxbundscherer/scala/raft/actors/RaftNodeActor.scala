@@ -256,7 +256,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case SimulateLeaderCrash =>
 
-      sender ! LeaderIsSimulatingCrash
+      sender ! LeaderIsSimulatingCrash()
 
       changeBehavior(
         fromBehavior = BehaviorEnum.LEADER,
@@ -266,7 +266,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case WhoIsLeader =>
 
-      sender ! IamTheLeader
+      sender ! IamTheLeader()
 
     case GrantVote =>   //Ignore message
 
