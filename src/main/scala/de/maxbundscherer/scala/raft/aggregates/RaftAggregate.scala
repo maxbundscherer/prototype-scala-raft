@@ -11,13 +11,16 @@ object RaftAggregate {
 
   object RequestVote  extends Request
   object GrantVote    extends Response
+
   object Heartbeat    extends Request
 
+  //FSM States (RaftNodeActor)
   object BehaviorEnum extends Enumeration {
     type BehaviorEnum = Value
     val UNINITIALIZED, FOLLOWER, CANDIDATE, LEADER = Value
   }
 
+  //Used by RaftScheduler
   object SchedulerTrigger {
     object ElectionTimeout
     object Heartbeat
