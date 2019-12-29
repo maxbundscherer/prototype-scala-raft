@@ -171,9 +171,9 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
                      toBehavior = BehaviorEnum.CANDIDATE,
                      loggerMessage = "No heartbeat from leader")
 
-    case SimulateLeaderCrash => sender ! IamNotTheLeader
+    case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
-    case WhoIsLeader         => sender ! IamNotTheLeader
+    case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
 
     case Heartbeat =>
 
@@ -209,9 +209,9 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case RequestVote => //Ignore message
 
-    case SimulateLeaderCrash => sender ! IamNotTheLeader
+    case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
-    case WhoIsLeader         => sender ! IamNotTheLeader
+    case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
 
     case GrantVote =>
 
@@ -288,9 +288,9 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
                      toBehavior = BehaviorEnum.FOLLOWER,
                      loggerMessage = s"Awake after downtime ${Config.sleepDowntime} seconds")
 
-    case SimulateLeaderCrash => sender ! IamNotTheLeader
+    case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
-    case WhoIsLeader         => sender ! IamNotTheLeader
+    case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
 
   }
 

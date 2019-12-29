@@ -14,9 +14,9 @@ object RaftAggregate {
 
   object Heartbeat    extends Request
 
-  object      WhoIsLeader                      extends Request
-  case class  IamTheLeader(actorName: String)  extends Response
-  object      IamNotTheLeader                  extends Response
+  object      WhoIsLeader                         extends Request
+  case class  IamTheLeader(actorName: String)     extends Response
+  case class  IamNotTheLeader(actorName: String)  extends Response
 
   object      SimulateLeaderCrash                         extends Request
   case class  LeaderIsSimulatingCrash(actorName: String)  extends Response
