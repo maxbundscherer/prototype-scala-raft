@@ -20,6 +20,9 @@ trait Configuration {
     //Raft Nodes (Amount)
     val nodes: Int = raftPrototypeConfig.getInt("nodes")
 
+    //Crash Interval (auto simulate crash after some heartbeats in LEADER behavior)
+    val crashIntervalHeartbeats: Int = raftPrototypeConfig.getInt("crashIntervalHeartbeats")
+
   }
 
 }
