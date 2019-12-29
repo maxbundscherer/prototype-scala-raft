@@ -3,7 +3,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date{ISO8601}] [%level] \t [%X{akkaSource}] - %msg%n</pattern>
+            <pattern>[%date{ISO8601}]\t[%level]\t[%X{akkaSource}]\t- %msg%n</pattern>
         </encoder>
     </appender>
 
