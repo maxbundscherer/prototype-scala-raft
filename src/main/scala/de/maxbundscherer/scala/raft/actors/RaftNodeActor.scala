@@ -4,12 +4,12 @@ import de.maxbundscherer.scala.raft.utils.{Configuration, RaftScheduler}
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import scala.concurrent.ExecutionContext
 
-object NodeActor {
+object RaftNodeActor {
 
   import akka.actor.{Cancellable, Props}
 
-  val prefix: String  = "nodeActor"
-  def props()(implicit executionContext: ExecutionContext): Props = Props(new NodeActor())
+  val prefix: String  = "raftNodeActor"
+  def props()(implicit executionContext: ExecutionContext): Props = Props(new RaftNodeActor())
 
   /**
     * Internal (mutable) actor state
@@ -45,13 +45,13 @@ object NodeActor {
   * - LEADER
   * - SLEEP (after simulated crash in LEADER)
   */
-class NodeActor()(implicit val executionContext: ExecutionContext)
+class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     extends Actor
     with ActorLogging
     with RaftScheduler
     with Configuration {
 
-  import NodeActor._
+  import RaftNodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.BehaviorEnum.BehaviorEnum
 
@@ -195,6 +195,7 @@ class NodeActor()(implicit val executionContext: ExecutionContext)
   def candidateBehavior: Receive = {
 
     case SchedulerTrigger.ElectionTimeout =>
+
       changeBehavior(
         fromBehavior = BehaviorEnum.CANDIDATE,
         toBehavior = BehaviorEnum.FOLLOWER,

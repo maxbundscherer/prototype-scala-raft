@@ -7,7 +7,7 @@ import akka.actor.{Actor, ActorLogging}
   */
 trait RaftScheduler extends Actor with ActorLogging with Configuration {
 
-  import de.maxbundscherer.scala.raft.actors.NodeActor.NodeState
+  import de.maxbundscherer.scala.raft.actors.RaftNodeActor.NodeState
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.SchedulerTrigger
   import scala.concurrent.ExecutionContext
   import scala.concurrent.duration._

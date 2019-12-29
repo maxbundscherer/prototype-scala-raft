@@ -9,7 +9,7 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
                                     timeout: Timeout,
                                     executionContext: ExecutionContext) {
 
-  import de.maxbundscherer.scala.raft.actors.NodeActor
+  import de.maxbundscherer.scala.raft.actors.RaftNodeActor
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
 
   /**
@@ -18,8 +18,8 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   final val nodes: Map[Int, ActorRef] =
     (0 until numberNodes)
       .map(i => {
-        i -> actorSystem.actorOf(props = NodeActor.props,
-                                 name = s"${NodeActor.prefix}-$i")
+        i -> actorSystem.actorOf(props = RaftNodeActor.props,
+                                 name = s"${RaftNodeActor.prefix}-$i")
       })
       .toMap
 
