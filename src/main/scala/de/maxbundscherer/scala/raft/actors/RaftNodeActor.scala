@@ -171,6 +171,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
                      toBehavior = BehaviorEnum.CANDIDATE,
                      loggerMessage = "No heartbeat from leader")
 
+    case SimulateLeaderCrash => //Ignore message
+
+    case WhoIsLeader =>         //Ignore message
+
     case Heartbeat =>
 
       log.debug(s"Got heartbeat from (${sender().path.name})")
@@ -204,6 +208,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     case Heartbeat =>   //Ignore message
 
     case RequestVote => //Ignore message
+
+    case SimulateLeaderCrash => //Ignore message
+
+    case WhoIsLeader => //Ignore message
 
     case GrantVote =>
 
@@ -242,9 +250,23 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
         changeBehavior(
           fromBehavior = BehaviorEnum.LEADER,
           toBehavior = BehaviorEnum.SLEEP,
-          loggerMessage =  s"Simulated test crash (crashIntervalHeartbeats) sleep ${Config.sleepDowntime} seconds"
+          loggerMessage =  s"Simulated test crash (crashIntervalHeartbeats) - sleep ${Config.sleepDowntime} seconds now"
         )
       }
+
+    case SimulateLeaderCrash =>
+
+      sender ! LeaderIsSimulatingCrash
+
+      changeBehavior(
+        fromBehavior = BehaviorEnum.LEADER,
+        toBehavior = BehaviorEnum.SLEEP,
+        loggerMessage =  s"Simulated test crash (externalTrigger) - sleep ${Config.sleepDowntime} seconds now"
+      )
+
+    case WhoIsLeader =>
+
+      sender ! IamTheLeader
 
     case GrantVote =>   //Ignore message
 
