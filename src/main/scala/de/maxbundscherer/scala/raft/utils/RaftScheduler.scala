@@ -5,7 +5,7 @@ import akka.actor.{Actor, ActorLogging}
 /**
   * RaftScheduler
   */
-trait RaftScheduler extends Actor with ActorLogging {
+trait RaftScheduler extends Actor with ActorLogging with Configuration {
 
   import de.maxbundscherer.scala.raft.actors.NodeActor.NodeState
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.SchedulerTrigger
@@ -18,42 +18,75 @@ trait RaftScheduler extends Actor with ActorLogging {
   val state: NodeState
   implicit val executionContext: ExecutionContext
 
-  //Set electionTimeout to randomInt in [1, maxSecondsElectionTimeout]
-  //TODO: Set maxSecondsElectionTimeout by config
-  private val electionTimeout: Int = 1 + scala.util.Random.nextInt(5)
+  //Set electionTimeout randomized in [electionTimerIntervalMin, electionTimerIntervalMax]
+  private val electionTimeout : Int = Config.electionTimerIntervalMin + scala.util.Random.nextInt(Config.electionTimerIntervalMax)
+
+  //Set heartbeat to fixed interval
+  private val heartbeatTimeout: Int = Config.heartbeatTimerInterval
 
   log.debug(s"Set electionTimeout to $electionTimeout seconds")
+  log.debug(s"Set heartbeatTimeout to $heartbeatTimeout seconds")
 
   /**
-    * Stop ElectionTimeoutTimer
+    * Stop electionTimer
     */
-  def stopElectionTimeoutTimer(): Unit = {
+  def stopElectionTimer(): Unit = {
 
-    if (state.electionTimeoutTimer.isDefined) {
-
-      log.debug("Stop ElectionTimeoutTimer")
-
-      state.electionTimeoutTimer.get.cancel()
-      state.electionTimeoutTimer = None
+    if (state.electionTimer.isDefined) {
+      log.debug("Stop electionTimer")
+      state.electionTimer.get.cancel()
+      state.electionTimer = None
     }
 
   }
 
   /**
-    * Start ElectionTimeoutTimer (if already running = stop)
-    */
-  def restartElectionTimeoutTimer(): Unit = {
+   * Start electionTimer (if already running = stop timer)
+   */
+  def restartElectionTimer(): Unit = {
 
-    stopElectionTimeoutTimer()
+    stopElectionTimer()
 
-    log.debug("Start ElectionTimeoutTimer")
+    log.debug("Start electionTimer")
 
-    state.electionTimeoutTimer = Some(
+    state.electionTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
         initialDelay = electionTimeout.seconds,
         delay = electionTimeout.seconds,
         receiver = self,
         message = SchedulerTrigger.ElectionTimeout
+      ))
+
+  }
+
+  /**
+   * Stop heartbeatTimer
+   */
+  def stopHeartbeatTimer(): Unit = {
+
+    if (state.heartbeatTimer.isDefined) {
+      log.debug("Stop heartbeatTimer")
+      state.heartbeatTimer.get.cancel()
+      state.heartbeatTimer = None
+    }
+
+  }
+
+  /**
+   * Start heartbeatTimer (if already running = stop timer)
+   */
+  def restartHeartbeatTimer(): Unit = {
+
+    stopHeartbeatTimer()
+
+    log.debug("Start heartbeatTimer")
+
+    state.heartbeatTimer = Some(
+      context.system.scheduler.scheduleWithFixedDelay(
+        initialDelay = heartbeatTimeout.seconds,
+        delay = heartbeatTimeout.seconds,
+        receiver = self,
+        message = SchedulerTrigger.Heartbeat
       ))
 
   }
