@@ -12,15 +12,15 @@ object NodeActor {
   def props()(implicit executionContext: ExecutionContext): Props = Props(new NodeActor())
 
   /**
-   * Internal (mutable) actor state
-   * @param neighbours Vector with another actors
-   * @param electionTimer Cancellable for timer (used in FOLLOWER and CANDIDATE behavior)
-   * @param heartbeatTimer Cancellable for timer (used in LEADER behavior)
-   * @param alreadyVoted Boolean (has already voted in FOLLOWER behavior)
-   * @param voteCounter Int (counter in CANDIDATE behavior)
-   * @param majority Int (calculated majority - set up in init)
-   * @param heartbeatCounter Int (auto simulate crash after some heartbeats in LEADER behavior)
-   */
+    * Internal (mutable) actor state
+    * @param neighbours Vector with another actors
+    * @param electionTimer Cancellable for timer (used in FOLLOWER and CANDIDATE behavior)
+    * @param heartbeatTimer Cancellable for timer (used in LEADER behavior)
+    * @param alreadyVoted Boolean (has already voted in FOLLOWER behavior)
+    * @param voteCounter Int (counter in CANDIDATE behavior)
+    * @param majority Int (calculated majority - set up in init)
+    * @param heartbeatCounter Int (auto simulate crash after some heartbeats in LEADER behavior)
+    */
   case class NodeState(
       var neighbours            : Vector[ActorRef]    = Vector.empty,
       var electionTimer         : Option[Cancellable] = None,
@@ -45,7 +45,11 @@ object NodeActor {
   * - LEADER
   * - SLEEP (after simulated crash in LEADER)
   */
-class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor with ActorLogging with RaftScheduler with Configuration {
+class NodeActor()(implicit val executionContext: ExecutionContext)
+    extends Actor
+    with ActorLogging
+    with RaftScheduler
+    with Configuration {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
@@ -147,9 +151,11 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
       state.neighbours = neighbours
       state.majority = ( (neighbours.size + 1) / 2 ) + 1
 
-      changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
-                     toBehavior = BehaviorEnum.FOLLOWER,
-                     loggerMessage = s"Got ${state.neighbours.size} neighbours (majority=${state.majority})")
+      changeBehavior(
+        fromBehavior = BehaviorEnum.UNINITIALIZED,
+        toBehavior = BehaviorEnum.FOLLOWER,
+        loggerMessage = s"Got ${state.neighbours.size} neighbours (majority=${state.majority})"
+      )
 
     case _: Any => log.error("Node is not initialized")
 
@@ -190,12 +196,12 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
   def candidateBehavior: Receive = {
 
     case SchedulerTrigger.ElectionTimeout =>
-
-      changeBehavior(fromBehavior = BehaviorEnum.CANDIDATE,
+      changeBehavior(
+        fromBehavior = BehaviorEnum.CANDIDATE,
         toBehavior = BehaviorEnum.FOLLOWER,
         loggerMessage = s"Not enough votes (${state.voteCounter}/${state.majority})")
 
-    case Heartbeat   => //Ignore message
+    case Heartbeat => //Ignore message
 
     case RequestVote => //Ignore message
 
@@ -205,11 +211,13 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
 
       log.debug(s"Got vote ${state.voteCounter}/${state.majority} from (${sender().path.name})")
 
-      if(state.voteCounter >= state.majority) {
+      if (state.voteCounter >= state.majority) {
 
-        changeBehavior(fromBehavior = BehaviorEnum.CANDIDATE,
+        changeBehavior(
+          fromBehavior = BehaviorEnum.CANDIDATE,
           toBehavior = BehaviorEnum.LEADER,
-          loggerMessage = s"Become leader - enough votes (${state.voteCounter}/${state.majority})")
+          loggerMessage = s"Become leader - enough votes (${state.voteCounter}/${state.majority})"
+        )
 
       }
 
@@ -230,8 +238,12 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
 
       state.heartbeatCounter = state.heartbeatCounter + 1
 
-      if(state.heartbeatCounter >= Config.crashIntervalHeartbeats) {
-        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.SLEEP, loggerMessage = s"Simulated test crash (crashIntervalHeartbeats) sleep ${Config.sleepDowntime} seconds")
+      if (state.heartbeatCounter >= Config.crashIntervalHeartbeats) {
+        changeBehavior(
+          fromBehavior = BehaviorEnum.LEADER,
+          toBehavior = BehaviorEnum.SLEEP,
+          loggerMessage =  s"Simulated test crash (crashIntervalHeartbeats) sleep ${Config.sleepDowntime} seconds"
+        )
       }
 
     case GrantVote =>   //Ignore message
@@ -245,13 +257,14 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
   }
 
   /**
-   * Sleep behavior
-   */
+    * Sleep behavior
+    */
   def sleepBehavior: Receive = {
 
     case SchedulerTrigger.Awake =>
-
-      changeBehavior(fromBehavior = BehaviorEnum.SLEEP, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = s"Awake after downtime ${Config.sleepDowntime} seconds")
+      changeBehavior(fromBehavior = BehaviorEnum.SLEEP,
+                     toBehavior = BehaviorEnum.FOLLOWER,
+                     loggerMessage = s"Awake after downtime ${Config.sleepDowntime} seconds")
 
   }
 

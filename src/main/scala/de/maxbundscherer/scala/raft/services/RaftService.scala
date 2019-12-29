@@ -5,7 +5,9 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext
 
-class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem, timeout: Timeout, executionContext: ExecutionContext) {
+class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
+                                    timeout: Timeout,
+                                    executionContext: ExecutionContext) {
 
   import de.maxbundscherer.scala.raft.actors.NodeActor
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
