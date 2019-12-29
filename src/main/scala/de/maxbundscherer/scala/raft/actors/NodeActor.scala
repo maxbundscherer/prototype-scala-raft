@@ -170,7 +170,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
 
     case any: Any =>
 
-      log.warning(s"Got unhandled message in followerBehavior '${any.getClass.getSimpleName}'")
+      log.warning(s"Got unhandled message in followerBehavior '${any.getClass.getSimpleName}' from (${sender().path.name})")
 
   }
 
@@ -205,7 +205,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
 
     case any: Any =>
 
-      log.warning(s"Got unhandled message in candidateBehavior '${any.getClass.getSimpleName}'")
+      log.warning(s"Got unhandled message in candidateBehavior '${any.getClass.getSimpleName}' from (${sender().path.name})")
 
   }
 
@@ -221,7 +221,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
       state.heartbeatCounter = state.heartbeatCounter + 1
 
       if(state.heartbeatCounter >= Config.crashIntervalHeartbeats) {
-        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = "Test crash")
+        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = "Simulated test crash (crashIntervalHeartbeats)")
       }
 
     case GrantVote =>   //Ignore message
@@ -230,7 +230,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
 
     case any: Any =>
 
-      log.warning(s"Got unhandled message in leaderBehavior '${any.getClass.getSimpleName}'")
+      log.warning(s"Got unhandled message in leaderBehavior '${any.getClass.getSimpleName}' from (${sender().path.name})")
 
   }
 
