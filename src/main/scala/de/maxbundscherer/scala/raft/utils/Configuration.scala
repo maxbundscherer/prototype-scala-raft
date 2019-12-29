@@ -23,6 +23,9 @@ trait Configuration {
     //Crash Interval (auto simulate crash after some heartbeats in LEADER behavior)
     val crashIntervalHeartbeats: Int = raftPrototypeConfig.getInt("crashIntervalHeartbeats")
 
+    // Sleep downtime (Seconds) (after simulated crash in SLEEP behavior)
+    val sleepDowntime: Int = raftPrototypeConfig.getInt("sleepDowntime")
+
   }
 
 }

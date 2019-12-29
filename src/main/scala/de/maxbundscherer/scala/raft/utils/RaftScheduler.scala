@@ -85,4 +85,12 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
 
   }
 
+  /**
+    * Start heartbeatTimer (if already running = stop timer)
+    */
+  def scheduleAwake(): Unit = context.system.scheduler.scheduleOnce(
+                                          delay = Config.sleepDowntime.seconds,
+                                          receiver = self,
+                                          message = SchedulerTrigger.Awake)
+
 }

@@ -17,13 +17,14 @@ object RaftAggregate {
   //FSM States (RaftNodeActor)
   object BehaviorEnum extends Enumeration {
     type BehaviorEnum = Value
-    val UNINITIALIZED, FOLLOWER, CANDIDATE, LEADER = Value
+    val UNINITIALIZED, FOLLOWER, CANDIDATE, LEADER, SLEEP = Value
   }
 
   //Used by RaftScheduler
   object SchedulerTrigger {
     object ElectionTimeout
     object Heartbeat
+    object Awake
   }
 
 }

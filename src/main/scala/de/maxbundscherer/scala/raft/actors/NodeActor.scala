@@ -41,15 +41,15 @@ object NodeActor {
   * # 3 Behaviors (Finite-state machine)
   *
   * - FOLLOWER (Default - after init)
+  * - CANDIDATE (after heartbeat timeout)
   * - LEADER
-  * - CANDIDATE
+  * - SLEEP (after simulated crash in LEADER)
   */
 class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor with ActorLogging with RaftScheduler with Configuration {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.BehaviorEnum.BehaviorEnum
-  import scala.concurrent.ExecutionContext
 
   /**
     * Mutable actor state
@@ -90,6 +90,12 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
         restartHeartbeatTimer()
         leaderBehavior
 
+      case BehaviorEnum.SLEEP =>
+
+        stopElectionTimer()
+        stopHeartbeatTimer()
+        sleepBehavior
+
       case _ =>
         stopElectionTimer()
         stopHeartbeatTimer()
@@ -120,6 +126,10 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
       case BehaviorEnum.LEADER =>
 
         state.heartbeatCounter = 0
+
+      case BehaviorEnum.SLEEP =>
+
+        scheduleAwake()
 
       case _ =>
 
@@ -221,7 +231,7 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
       state.heartbeatCounter = state.heartbeatCounter + 1
 
       if(state.heartbeatCounter >= Config.crashIntervalHeartbeats) {
-        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = "Simulated test crash (crashIntervalHeartbeats)")
+        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.SLEEP, loggerMessage = s"Simulated test crash (crashIntervalHeartbeats) sleep ${Config.sleepDowntime} seconds")
       }
 
     case GrantVote =>   //Ignore message
@@ -231,6 +241,17 @@ class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor
     case any: Any =>
 
       log.warning(s"Got unhandled message in leaderBehavior '${any.getClass.getSimpleName}' from (${sender().path.name})")
+
+  }
+
+  /**
+   * Sleep behavior
+   */
+  def sleepBehavior: Receive = {
+
+    case SchedulerTrigger.Awake =>
+
+      changeBehavior(fromBehavior = BehaviorEnum.SLEEP, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = s"Awake after downtime ${Config.sleepDowntime} seconds")
 
   }
 
