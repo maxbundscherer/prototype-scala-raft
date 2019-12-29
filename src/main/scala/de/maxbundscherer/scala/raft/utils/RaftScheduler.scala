@@ -1,11 +1,11 @@
 package de.maxbundscherer.scala.raft.utils
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.Actor
 
 /**
   * RaftScheduler
   */
-trait RaftScheduler extends Actor with ActorLogging with Configuration {
+trait RaftScheduler extends Actor with Configuration {
 
   import de.maxbundscherer.scala.raft.actors.RaftNodeActor.NodeState
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate.SchedulerTrigger
@@ -19,13 +19,10 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   implicit val executionContext: ExecutionContext
 
   //Set electionTimeout randomized in [electionTimerIntervalMin, electionTimerIntervalMax]
-  private val electionTimeout : Int = Config.electionTimerIntervalMin * 1000 + scala.util.Random.nextInt(Config.electionTimerIntervalMax * 1000)
+  private def electionTimeout : Int = Config.electionTimerIntervalMin * 1000 + scala.util.Random.nextInt(Config.electionTimerIntervalMax * 1000)
 
   //Set heartbeat to fixed interval
   private val heartbeatTimeout: Int = Config.heartbeatTimerInterval * 1000
-
-  log.info(s"Set electionTimeout to $electionTimeout millis")
-  log.debug(s"Set heartbeatTimeout to $heartbeatTimeout millis")
 
   /**
     * Stop electionTimer
