@@ -19,13 +19,13 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   implicit val executionContext: ExecutionContext
 
   //Set electionTimeout randomized in [electionTimerIntervalMin, electionTimerIntervalMax]
-  private val electionTimeout : Int = Config.electionTimerIntervalMin + scala.util.Random.nextInt(Config.electionTimerIntervalMax)
+  private val electionTimeout : Int = Config.electionTimerIntervalMin * 1000 + scala.util.Random.nextInt(Config.electionTimerIntervalMax * 1000)
 
   //Set heartbeat to fixed interval
-  private val heartbeatTimeout: Int = Config.heartbeatTimerInterval
+  private val heartbeatTimeout: Int = Config.heartbeatTimerInterval * 1000
 
-  log.debug(s"Set electionTimeout to $electionTimeout seconds")
-  log.debug(s"Set heartbeatTimeout to $heartbeatTimeout seconds")
+  log.info(s"Set electionTimeout to $electionTimeout millis")
+  log.debug(s"Set heartbeatTimeout to $heartbeatTimeout millis")
 
   /**
     * Stop electionTimer
@@ -48,8 +48,8 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
 
     state.electionTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
-        initialDelay = electionTimeout.seconds,
-        delay = electionTimeout.seconds,
+        initialDelay = electionTimeout.millis,
+        delay = electionTimeout.millis,
         receiver = self,
         message = SchedulerTrigger.ElectionTimeout
       ))
@@ -77,8 +77,8 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
 
     state.heartbeatTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
-        initialDelay = heartbeatTimeout.seconds,
-        delay = heartbeatTimeout.seconds,
+        initialDelay = heartbeatTimeout.millis,
+        delay = heartbeatTimeout.millis,
         receiver = self,
         message = SchedulerTrigger.Heartbeat
       ))
