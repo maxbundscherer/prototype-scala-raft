@@ -1,6 +1,6 @@
 package de.maxbundscherer.scala.raft.actors
 
-import de.maxbundscherer.scala.raft.utils.RaftScheduler
+import de.maxbundscherer.scala.raft.utils.{Configuration, RaftScheduler}
 import akka.actor.{Actor, ActorLogging, ActorRef}
 
 object NodeActor {
@@ -10,9 +10,24 @@ object NodeActor {
   val prefix  : String  = "nodeActor"
   def props   : Props   = Props(new NodeActor())
 
+  /**
+   * Internal (mutable) actor state
+   * @param neighbours Vector with another actors
+   * @param electionTimer Cancellable for timer (used in FOLLOWER and CANDIDATE behavior)
+   * @param heartbeatTimer Cancellable for timer (used in LEADER behavior)
+   * @param alreadyVoted Boolean (has already voted in FOLLOWER behavior)
+   * @param voteCounter Int (counter in CANDIDATE behavior)
+   * @param majority Int (calculated majority - set up in init)
+   * @param heartbeatCounter Int (auto simulate crash after some heartbeats in LEADER behavior)
+   */
   case class NodeState(
       var neighbours            : Vector[ActorRef]    = Vector.empty,
-      var electionTimeoutTimer  : Option[Cancellable] = None
+      var electionTimer         : Option[Cancellable] = None,
+      var heartbeatTimer        : Option[Cancellable] = None,
+      var alreadyVoted          : Boolean             = false,
+      var voteCounter           : Int                 = 0,
+      var majority              : Int                 = -1,
+      var heartbeatCounter      : Int                 = 0,
   )
 
 }
@@ -24,11 +39,11 @@ object NodeActor {
   *
   * # 3 Behaviors (Finite-state machine)
   *
-  * - FOLLOWER (Default)
+  * - FOLLOWER (Default - after init)
   * - LEADER
   * - CANDIDATE
   */
-class NodeActor extends Actor with ActorLogging with RaftScheduler {
+class NodeActor extends Actor with ActorLogging with RaftScheduler with Configuration {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
@@ -61,19 +76,23 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
     val newBehavior: Receive = toBehavior match {
 
       case BehaviorEnum.FOLLOWER =>
-        restartElectionTimeoutTimer()
+        restartElectionTimer()
+        stopHeartbeatTimer()
         followerBehavior
 
       case BehaviorEnum.CANDIDATE =>
-        stopElectionTimeoutTimer()
+        restartElectionTimer()
+        stopHeartbeatTimer()
         candidateBehavior
 
       case BehaviorEnum.LEADER =>
-        stopElectionTimeoutTimer()
+        stopElectionTimer()
+        restartHeartbeatTimer()
         leaderBehavior
 
       case _ =>
-        stopElectionTimeoutTimer()
+        stopElectionTimer()
+        stopHeartbeatTimer()
         receive
 
     }
@@ -88,9 +107,19 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
       */
     toBehavior match {
 
+      case BehaviorEnum.FOLLOWER =>
+
+        state.alreadyVoted = false
+
       case BehaviorEnum.CANDIDATE =>
+
+        state.voteCounter = 0
         state.neighbours.foreach(neighbour => neighbour ! RequestVote)
         self ! GrantVote
+
+      case BehaviorEnum.LEADER =>
+
+        state.heartbeatCounter = 0
 
       case _ =>
 
@@ -106,10 +135,11 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
     case InitActor(neighbours) =>
 
       state.neighbours = neighbours
+      state.majority = ( (neighbours.size + 1) / 2 ) + 1
 
       changeBehavior(fromBehavior = BehaviorEnum.UNINITIALIZED,
                      toBehavior = BehaviorEnum.FOLLOWER,
-                     loggerMessage = s"Got ${state.neighbours.size} neighbours")
+                     loggerMessage = s"Got ${state.neighbours.size} neighbours (majority=${state.majority})")
 
     case _: Any => log.error("Node is not initialized")
 
@@ -124,9 +154,22 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
 
       changeBehavior(fromBehavior = BehaviorEnum.FOLLOWER,
                      toBehavior = BehaviorEnum.CANDIDATE,
-                     loggerMessage = "ElectionTimeout")
+                     loggerMessage = "No heartbeat from leader")
+
+    case Heartbeat =>
+
+      log.debug(s"Got heartbeat from (${sender().path.name})")
+      restartElectionTimer()
+
+    case RequestVote =>
+
+      if(!state.alreadyVoted) {
+        sender ! GrantVote
+        state.alreadyVoted = true
+      }
 
     case any: Any =>
+
       log.warning(s"Got unhandled message in followerBehavior '${any.getClass.getSimpleName}'")
 
   }
@@ -136,7 +179,32 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
     */
   def candidateBehavior: Receive = {
 
+    case SchedulerTrigger.ElectionTimeout =>
+
+      changeBehavior(fromBehavior = BehaviorEnum.CANDIDATE,
+        toBehavior = BehaviorEnum.FOLLOWER,
+        loggerMessage = s"Not enough votes (${state.voteCounter}/${state.majority})")
+
+    case Heartbeat   => //Ignore message
+
+    case RequestVote => //Ignore message
+
+    case GrantVote =>
+
+      state.voteCounter = state.voteCounter + 1
+
+      log.debug(s"Got vote ${state.voteCounter}/${state.majority} from (${sender().path.name})")
+
+      if(state.voteCounter >= state.majority) {
+
+        changeBehavior(fromBehavior = BehaviorEnum.CANDIDATE,
+          toBehavior = BehaviorEnum.LEADER,
+          loggerMessage = "Become leader (enough votes)")
+
+      }
+
     case any: Any =>
+
       log.warning(s"Got unhandled message in candidateBehavior '${any.getClass.getSimpleName}'")
 
   }
@@ -146,7 +214,22 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler {
     */
   def leaderBehavior: Receive = {
 
+    case SchedulerTrigger.Heartbeat =>
+
+      state.neighbours.foreach(neighbour => neighbour ! Heartbeat)
+
+      state.heartbeatCounter = state.heartbeatCounter + 1
+
+      if(state.heartbeatCounter >= Config.crashIntervalHeartbeats) {
+        changeBehavior(fromBehavior = BehaviorEnum.LEADER, toBehavior = BehaviorEnum.FOLLOWER, loggerMessage = "Test crash")
+      }
+
+    case GrantVote =>   //Ignore message
+
+    case RequestVote => //Ignore message
+
     case any: Any =>
+
       log.warning(s"Got unhandled message in leaderBehavior '${any.getClass.getSimpleName}'")
 
   }
