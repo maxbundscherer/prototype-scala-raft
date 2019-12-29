@@ -6,7 +6,7 @@ trait Configuration {
 
     import com.typesafe.config.ConfigFactory
 
-    private val raftPrototypeConfig = ConfigFactory.load("raftPrototype")
+    private val raftPrototypeConfig = ConfigFactory.load().getConfig("raftPrototype")
 
     //Election Timer Min (Seconds)
     val electionTimerIntervalMin: Int = raftPrototypeConfig.getInt("electionTimerIntervalMin")

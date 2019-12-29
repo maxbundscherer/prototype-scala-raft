@@ -33,7 +33,6 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   def stopElectionTimer(): Unit = {
 
     if (state.electionTimer.isDefined) {
-      log.debug("Stop electionTimer")
       state.electionTimer.get.cancel()
       state.electionTimer = None
     }
@@ -46,8 +45,6 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   def restartElectionTimer(): Unit = {
 
     stopElectionTimer()
-
-    log.debug("Start electionTimer")
 
     state.electionTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
@@ -65,7 +62,6 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   def stopHeartbeatTimer(): Unit = {
 
     if (state.heartbeatTimer.isDefined) {
-      log.debug("Stop heartbeatTimer")
       state.heartbeatTimer.get.cancel()
       state.heartbeatTimer = None
     }
@@ -78,8 +74,6 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   def restartHeartbeatTimer(): Unit = {
 
     stopHeartbeatTimer()
-
-    log.debug("Start heartbeatTimer")
 
     state.heartbeatTimer = Some(
       context.system.scheduler.scheduleWithFixedDelay(
