@@ -14,11 +14,11 @@ object RaftAggregate {
 
   object Heartbeat    extends Request
 
-  object      WhoIsLeader     extends Request
-  case class  IamTheLeader()  extends Response
+  object      WhoIsLeader                      extends Request
+  case class  IamTheLeader(actorName: String)  extends Response
 
-  object    SimulateLeaderCrash         extends Request
-  case class LeaderIsSimulatingCrash()  extends Response
+  object      SimulateLeaderCrash                         extends Request
+  case class  LeaderIsSimulatingCrash(actorName: String)  extends Response
 
   //FSM States (RaftNodeActor)
   object BehaviorEnum extends Enumeration {
