@@ -1,11 +1,12 @@
 package de.maxbundscherer.scala.raft
 
+import de.maxbundscherer.scala.raft.utils.Configuration
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
-object Main extends App {
+object Main extends App with Configuration {
 
   import de.maxbundscherer.scala.raft.services._
 
@@ -15,6 +16,6 @@ object Main extends App {
 
   private val log = actorSystem.log
 
-  private val raftService = new RaftService(numberNodes = 5)
+  private val raftService = new RaftService(numberNodes = Config.nodes)
 
 }

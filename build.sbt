@@ -14,5 +14,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion % "test
 logBuffered in Test := false //Disable buffered logs in test
 parallelExecution in Test := false //Run suites sequentially
 
+//Config Factory
+libraryDependencies += "com.typesafe" % "config" % "1.4.0"
+
 //Logger
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
