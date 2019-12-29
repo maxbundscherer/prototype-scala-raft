@@ -11,6 +11,7 @@ object RaftAggregate {
 
   object RequestVote  extends Request
   object GrantVote    extends Response
+  object Heartbeat    extends Request
 
   object BehaviorEnum extends Enumeration {
     type BehaviorEnum = Value
@@ -19,6 +20,7 @@ object RaftAggregate {
 
   object SchedulerTrigger {
     object ElectionTimeout
+    object Heartbeat
   }
 
 }
