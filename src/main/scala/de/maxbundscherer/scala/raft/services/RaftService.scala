@@ -4,6 +4,8 @@ import akka.pattern.ask
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
                                     timeout: Timeout,
@@ -28,6 +30,44 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
     */
   nodes.foreach(node =>
     node._2 ! InitActor(nodes.filter(_._1 != node._1).values.toVector))
+
+  /**
+   * Ask each node: Are you the leader? (Waiting for result - blocking)
+   * @return Vector with Either [Left = IamTheLeader, Right = IamNotTheLeader]
+   */
+  def evaluateActualLeaders: Vector[Either[IamTheLeader, IamNotTheLeader]] = {
+
+    nodes.map(node => {
+
+      val awaitedResult = Await.result(node._2 ? WhoIsLeader, timeout.duration)
+
+      awaitedResult match {
+        case msg: IamTheLeader    => Left(msg)
+        case msg: IamNotTheLeader => Right(msg)
+      }
+
+    }).toVector
+
+  }
+
+  /**
+   * Send SimulateLeaderCrash to each node (Leader is confirming - Waiting for result - blocking)
+   * @return Vector with Either [Left = LeaderIsSimulatingCrash, Right = IamNotTheLeader]
+   */
+  def simulateLeaderCrash(): Vector[Either[LeaderIsSimulatingCrash, IamNotTheLeader]] = {
+
+    nodes.map(node => {
+
+      val awaitedResult = Await.result(node._2 ? SimulateLeaderCrash, timeout.duration)
+
+      awaitedResult match {
+        case msg: LeaderIsSimulatingCrash => Left(msg)
+        case msg: IamNotTheLeader         => Right(msg)
+      }
+
+    }).toVector
+
+  }
 
   /**
    * Terminates actor system
