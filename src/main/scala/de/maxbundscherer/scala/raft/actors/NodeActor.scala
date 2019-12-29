@@ -2,13 +2,14 @@ package de.maxbundscherer.scala.raft.actors
 
 import de.maxbundscherer.scala.raft.utils.{Configuration, RaftScheduler}
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import scala.concurrent.ExecutionContext
 
 object NodeActor {
 
   import akka.actor.{Cancellable, Props}
 
-  val prefix  : String  = "nodeActor"
-  def props   : Props   = Props(new NodeActor())
+  val prefix: String  = "nodeActor"
+  def props()(implicit executionContext: ExecutionContext): Props = Props(new NodeActor())
 
   /**
    * Internal (mutable) actor state
@@ -43,7 +44,7 @@ object NodeActor {
   * - LEADER
   * - CANDIDATE
   */
-class NodeActor extends Actor with ActorLogging with RaftScheduler with Configuration {
+class NodeActor()(implicit val executionContext: ExecutionContext) extends Actor with ActorLogging with RaftScheduler with Configuration {
 
   import NodeActor._
   import de.maxbundscherer.scala.raft.aggregates.RaftAggregate._
@@ -54,7 +55,6 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
     * Mutable actor state
     */
   override val state = NodeState()
-  override implicit val executionContext: ExecutionContext = context.system.dispatcher
 
   log.info("Actor online (uninitialized)")
 
