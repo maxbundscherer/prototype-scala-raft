@@ -199,7 +199,7 @@ class NodeActor extends Actor with ActorLogging with RaftScheduler with Configur
 
         changeBehavior(fromBehavior = BehaviorEnum.CANDIDATE,
           toBehavior = BehaviorEnum.LEADER,
-          loggerMessage = "Become leader (enough votes)")
+          loggerMessage = "Become leader - enough votes")
 
       }
 
