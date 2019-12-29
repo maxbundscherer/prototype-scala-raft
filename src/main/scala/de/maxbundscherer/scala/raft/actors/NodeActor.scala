@@ -95,7 +95,6 @@ class NodeActor()(implicit val executionContext: ExecutionContext)
         leaderBehavior
 
       case BehaviorEnum.SLEEP =>
-
         stopElectionTimer()
         stopHeartbeatTimer()
         sleepBehavior
@@ -201,7 +200,7 @@ class NodeActor()(implicit val executionContext: ExecutionContext)
         toBehavior = BehaviorEnum.FOLLOWER,
         loggerMessage = s"Not enough votes (${state.voteCounter}/${state.majority})")
 
-    case Heartbeat => //Ignore message
+    case Heartbeat =>   //Ignore message
 
     case RequestVote => //Ignore message
 
