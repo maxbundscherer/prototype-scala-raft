@@ -41,8 +41,8 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   }
 
   /**
-   * Start electionTimer (if already running = stop timer)
-   */
+    * Start electionTimer (if already running = stop timer)
+    */
   def restartElectionTimer(): Unit = {
 
     stopElectionTimer()
@@ -60,8 +60,8 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   }
 
   /**
-   * Stop heartbeatTimer
-   */
+    * Stop heartbeatTimer
+    */
   def stopHeartbeatTimer(): Unit = {
 
     if (state.heartbeatTimer.isDefined) {
@@ -73,8 +73,8 @@ trait RaftScheduler extends Actor with ActorLogging with Configuration {
   }
 
   /**
-   * Start heartbeatTimer (if already running = stop timer)
-   */
+    * Start heartbeatTimer (if already running = stop timer)
+    */
   def restartHeartbeatTimer(): Unit = {
 
     stopHeartbeatTimer()
