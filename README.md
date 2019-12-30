@@ -15,8 +15,8 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 - [sbt](https://www.scala-sbt.org/) and [openjdk64-11.0.2](https://jdk.java.net/archive/) are required to build and run project
 
-- Run with: ``sbt run`` (see [What happens in normal run?][1] below)
-- Test with: ``sbt test`` (or see ci-tests in GitHub-Actions-CI-Pipeline) (see [What happens in test run?][2] below)
+- Run with: ``sbt run`` (see ***What happens in normal run?*** below)
+- Test with: ``sbt test`` (or see ci-tests in GitHub-Actions-CI-Pipeline) (see ***What happens in test run?*** below)
 
 ### What is implemented?
 
@@ -30,11 +30,11 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
     
 ![](./docImg/raftFsm.png)
 
-[1]: #### What happens in normal run?
+#### What happens in normal run?
 
 tbd.
 
-[2] #### What happens in test run?
+#### What happens in test run?
 
 tbd.
 
