@@ -181,10 +181,24 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case _: AppendData       => sender ! IamNotTheLeader(actorName = self.path.name)
 
-    case Heartbeat =>
+    case Heartbeat(lastHashCode) =>
 
       log.debug(s"Got heartbeat from (${sender().path.name})")
+
+      if(! lastHashCode.equals(state.lastHashCode)) {
+
+        log.info("I am not consistent - request data from leader")
+        sender ! IamNotConsistent
+      }
+
       restartElectionTimer()
+
+    case OverrideData(newData) =>
+
+      state.data = newData
+      state.lastHashCode = state.data.hashCode()
+
+      log.info(s"Follower is writing data (newHashCode = ${state.lastHashCode})")
 
     case RequestVote =>
 
@@ -250,7 +264,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case SchedulerTrigger.Heartbeat =>
 
-      state.neighbours.foreach(neighbour => neighbour ! Heartbeat)
+      state.neighbours.foreach(neighbour => neighbour ! Heartbeat(lastHashCode = state.lastHashCode))
 
       state.heartbeatCounter = state.heartbeatCounter + 1
 
@@ -284,6 +298,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
       log.info(s"Leader is appending data ($key->$value) (newHashCode = ${state.lastHashCode})")
 
       sender ! WriteSuccess(actorName = self.path.name)
+
+    case IamNotConsistent =>
+
+      sender ! OverrideData(data = state.data)
 
     case GrantVote =>   //Ignore message
 

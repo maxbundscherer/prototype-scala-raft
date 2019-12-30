@@ -12,7 +12,9 @@ object RaftAggregate {
   object RequestVote  extends Request
   object GrantVote    extends Response
 
-  object Heartbeat    extends Request
+  case class  Heartbeat(lastHashCode: Int)            extends Request
+  object      IamNotConsistent                        extends Response
+  case class  OverrideData(data: Map[String, String]) extends Request
 
   object      WhoIsLeader                         extends Request
   case class  IamTheLeader(actorName: String)     extends Response
