@@ -44,7 +44,7 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 There are two configurations:
 
 - ``./src/main/resources/application.conf`` used for normal run
-- ``./src/main/resources/application.conf`` used for test run
+- ``./src/test/resources/application.conf`` used for test run
     
 ```
 akka {
