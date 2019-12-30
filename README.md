@@ -77,7 +77,7 @@ raftPrototype {
 }
 ```
 
-#### What happens in normal run?
+### What happens in normal run?
 
 All nodes starts in follower behavior (some of them will change their behavior to candidate) and will elect the first leader. After some (configured) heartbeats from leader, the leader is simulating crash and is "sleeping" for configured downtime. The next leader will be elected.
 
@@ -85,7 +85,7 @@ This happens again and again and again... till you stop the program or the earth
 
 Data exchange (write data trough leader to followers) will be tested in test run.
 
-#### What happens in test run?
+### What happens in test run?
 
 1. Leader election
 2. Write data trough leader to followers
