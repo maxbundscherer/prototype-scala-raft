@@ -41,10 +41,10 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 #### Configuration
 
-- There are two configuration:
+There are two configurations:
 
-    - ``./src/main/resources/application.conf`` used for normal run
-    - ``./src/main/resources/application.conf`` used for test run
+- ``./src/main/resources/application.conf`` used for normal run
+- ``./src/main/resources/application.conf`` used for test run
     
 ```
 akka {
