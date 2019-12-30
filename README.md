@@ -2,6 +2,8 @@
 
 **Protoype Raft Consensus Algorithm in Scala**
 
+![](./docImg/logos.png)
+
 Tested on ``macOs 10.15.2`` with ``openjdk64-11.0.2`` and ``sbt 1.3.3``
 
 [![shields.io](http://img.shields.io/badge/license-Apache2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -25,6 +27,8 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
     - ``Candidate``: The candidate requests votes from all followers and votes for himself. If he gets the majority in configured interval, he become the leader. If not he become follower again.
     - ``Leader``: The leader is sending continuous heartbeats to all followers with hashCode from his stored data. The leader is the only node that is allowed to write data.
     - ``(Sleep)``: Is used for simulating leader-crashes (triggered by ***crashIntervalHeartbeats*** in normal run or by ***SimulateLeaderCrash*** in test run). In this behavior the node does not respond to non-debug-messages. After configured downtime the node is changing to follower-behavior.
+    
+![](./docImg/raftFsm.png)
     
 ## Talk about ...
 
