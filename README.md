@@ -13,11 +13,10 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ## Let's get started
 
-- You need [sbt](https://www.scala-sbt.org/) to build and run project
-- You need [openjdk64-11.0.2](https://jdk.java.net/archive/)
+- [sbt](https://www.scala-sbt.org/) and [openjdk64-11.0.2](https://jdk.java.net/archive/) are required to build and run project
 
-- Run with: ``sbt run``
-- Test with: ``sbt test`` (or see ci-tests in GitHub-Actions-CI-Pipeline)
+- Run with: ``sbt run`` (see [What happens in normal run?][1] below)
+- Test with: ``sbt test`` (or see ci-tests in GitHub-Actions-CI-Pipeline) (see [What happens in test run?][2] below)
 
 ### What is implemented?
 
@@ -30,7 +29,15 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
     - ``(Sleep)``: Is used for simulating leader-crashes (triggered by ***crashIntervalHeartbeats*** in normal run or by ***SimulateLeaderCrash*** in test run). In this behavior the node does not respond to non-debug-messages. After configured downtime the node is changing to follower-behavior.
     
 ![](./docImg/raftFsm.png)
-    
+
+[1]: #### What happens in normal run?
+
+tbd.
+
+[2] #### What happens in test run?
+
+tbd.
+
 ## Talk about ...
 
 - ... enums in scala
