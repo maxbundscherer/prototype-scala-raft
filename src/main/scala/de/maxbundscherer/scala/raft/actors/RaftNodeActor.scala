@@ -303,7 +303,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
       state.data = state.data + (key -> value)
       state.lastHashCode = state.data.hashCode()
 
-      log.info(s"Leader is appending data ($key->$value) (newHashCode = ${state.lastHashCode})")
+      log.info(s"Leader is writing data ($key->$value) (newHashCode = ${state.lastHashCode})")
 
       sender ! WriteSuccess(actorName = self.path.name)
 

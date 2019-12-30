@@ -103,6 +103,37 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
       data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
     }
 
+    "append new data in leader node" in {
+
+      val newDataKey    = "key2"
+      val newDataValue  = "val2"
+
+      temporaryData = temporaryData + (newDataKey->newDataValue)
+
+      val data: Vector[Either[WriteSuccess, IamNotTheLeader]] = raftService.appendData(key = newDataKey, value = newDataValue)
+
+      val localLeaderName = data.filter(_.isLeft).head match {
+        case Left(left) => left.actorName
+        case _ => ""
+      }
+
+      localLeaderName       should not be temporaryFirstLeaderName
+      data.count(_.isLeft)  shouldBe 1 //Only on leader
+      data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
+    }
+
+    "has all nodes synchronized with new data again" in {
+
+      freezeTest(seconds = Config.nodes * Config.heartbeatTimerInterval, loggerMessage = "Waiting for sync data")
+
+      val data: Vector[ActualData] = raftService.evaluateActualData
+
+      val uniqueHashCodes: Vector[Int] = data.map(_.data.hashCode()).distinct
+
+      uniqueHashCodes.size shouldBe 1
+      uniqueHashCodes.head shouldBe temporaryData.hashCode()
+    }
+
     "terminate actor system" in {
 
       raftService.terminate().map(response => response shouldBe true)
