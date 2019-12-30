@@ -211,9 +211,9 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
         toBehavior = BehaviorEnum.FOLLOWER,
         loggerMessage = s"Not enough votes (${state.voteCounter}/${state.majority})")
 
-    case Heartbeat =>   //Ignore message
+    case _: Heartbeat =>    //Ignore message
 
-    case RequestVote => //Ignore message
+    case RequestVote =>     //Ignore message
 
     case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
@@ -276,12 +276,12 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
       sender ! IamTheLeader(actorName = self.path.name)
 
-    case cmd: AppendData =>
+    case AppendData(key, value) =>
 
-      state.data = state.data + (cmd.key -> cmd.value)
+      state.data = state.data + (key -> value)
       state.lastHashCode = state.data.hashCode()
 
-      log.info(s"Leader is appending data (${cmd.key}->${cmd.value}) (newHashCode = ${state.lastHashCode})")
+      log.info(s"Leader is appending data ($key->$value) (newHashCode = ${state.lastHashCode})")
 
       sender ! WriteSuccess(actorName = self.path.name)
 
