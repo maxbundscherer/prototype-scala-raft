@@ -69,7 +69,7 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   }
 
   /**
-   * Append data (only leader is allowed to write data - synchronised by heartbeat from leader with followers)
+   * Append data (only leader is allowed to write data - synchronised by heartbeat from leader with followers - blocking)
    * @param key String
    * @param value String
    * @return Vector with Either [Left = WriteSuccess, Right = IamNotTheLeader]
@@ -90,7 +90,7 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   }
 
   /**
-   * Ask each node: Provide your actual data
+   * Ask each node: Provide your actual data (blocking)
    * @return Vector with ActualData
    */
   def evaluateActualData: Vector[ActualData] = {
