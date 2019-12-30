@@ -276,6 +276,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
         )
       }
 
+    case GrantVote =>   //Ignore message
+
+    case RequestVote => //Ignore message
+
     case SimulateLeaderCrash =>
 
       sender ! LeaderIsSimulatingCrash(actorName = self.path.name)
@@ -302,10 +306,6 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     case IamNotConsistent =>
 
       sender ! OverrideData(data = state.data)
-
-    case GrantVote =>   //Ignore message
-
-    case RequestVote => //Ignore message
 
     case any: Any =>
 
