@@ -21,6 +21,9 @@ object RaftAggregate {
   object      SimulateLeaderCrash                         extends Request
   case class  LeaderIsSimulatingCrash(actorName: String)  extends Response
 
+  case class  AppendData(key: String, value: String)  extends Request
+  case class  WriteSuccess(actorName: String)         extends Response
+
   //FSM States (RaftNodeActor)
   object BehaviorEnum extends Enumeration {
     type BehaviorEnum = Value

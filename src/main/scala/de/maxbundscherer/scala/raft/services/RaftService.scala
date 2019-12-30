@@ -70,6 +70,27 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   }
 
   /**
+   * Append data (only leader is allowed to write data - synchronised by heartbeat from leader with followers)
+   * @param key String
+   * @param value String
+   * @return Vector with Either [Left = WriteSuccess, Right = IamNotTheLeader]
+   */
+  def appendData(key: String, value: String): Vector[Either[WriteSuccess, IamNotTheLeader]] = {
+
+    nodes.map(node => {
+
+      val awaitedResult = Await.result(node._2 ? AppendData(key = key, value = value), timeout.duration)
+
+      awaitedResult match {
+        case msg: WriteSuccess            => Left(msg)
+        case msg: IamNotTheLeader         => Right(msg)
+      }
+
+    }).toVector
+
+  }
+
+  /**
    * Terminates actor system
    */
   def terminate(): Future[Boolean] = actorSystem.terminate().map(_ => true)

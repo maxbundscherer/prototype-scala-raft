@@ -40,6 +40,20 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
       data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
     }
 
+    "leader append data" in {
+
+      val data: Vector[Either[WriteSuccess, IamNotTheLeader]] = raftService.appendData(key = "key1", value = "val1")
+
+      val localLeaderName = data.filter(_.isLeft).head match {
+        case Left(left) => left.actorName
+        case _ => ""
+      }
+
+      localLeaderName       shouldBe temporaryFirstLeaderName
+      data.count(_.isLeft)  shouldBe 1 //Only on leader
+      data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
+    }
+
     "simulate leader crash" in {
 
       val data: Vector[Either[LeaderIsSimulatingCrash, IamNotTheLeader]] = raftService.simulateLeaderCrash()

@@ -20,6 +20,8 @@ object RaftNodeActor {
     * @param voteCounter Int (counter in CANDIDATE behavior)
     * @param majority Int (calculated majority - set up in init)
     * @param heartbeatCounter Int (auto simulate crash after some heartbeats in LEADER behavior)
+   *  @param data Map (String->String) (used in FOLLOWER and LEADER behavior)
+   *  @param lastHashCode Int (last hashcode from data) (used in FOLLOWER and LEADER behavior)
     */
   case class NodeState(
       var neighbours            : Vector[ActorRef]    = Vector.empty,
@@ -29,6 +31,8 @@ object RaftNodeActor {
       var voteCounter           : Int                 = 0,
       var majority              : Int                 = -1,
       var heartbeatCounter      : Int                 = 0,
+      var data                  : Map[String, String] = Map.empty,
+      var lastHashCode          : Int                 = -1,
   )
 
 }
@@ -175,6 +179,8 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
 
+    case _: AppendData       => sender ! IamNotTheLeader(actorName = self.path.name)
+
     case Heartbeat =>
 
       log.debug(s"Got heartbeat from (${sender().path.name})")
@@ -212,6 +218,8 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
     case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
+
+    case _: AppendData       => sender ! IamNotTheLeader(actorName = self.path.name)
 
     case GrantVote =>
 
@@ -268,6 +276,15 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
       sender ! IamTheLeader(actorName = self.path.name)
 
+    case cmd: AppendData =>
+
+      state.data = state.data + (cmd.key -> cmd.value)
+      state.lastHashCode = state.data.hashCode()
+
+      log.info(s"Leader is appending data (${cmd.key}->${cmd.value}) (newHashCode = ${state.lastHashCode})")
+
+      sender ! WriteSuccess(actorName = self.path.name)
+
     case GrantVote =>   //Ignore message
 
     case RequestVote => //Ignore message
@@ -291,6 +308,8 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     case SimulateLeaderCrash => sender ! IamNotTheLeader(actorName = self.path.name)
 
     case WhoIsLeader         => sender ! IamNotTheLeader(actorName = self.path.name)
+
+    case _: AppendData       => sender ! IamNotTheLeader(actorName = self.path.name)
 
   }
 
