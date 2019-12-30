@@ -39,6 +39,44 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
     
 ![](./docImg/raftFsm.png)
 
+#### Configuration
+
+- There are two configuration:
+
+    - ``./src/main/resources/application.conf`` used for normal run
+    - ``./src/main/resources/application.conf`` used for test run
+    
+```
+akka {
+
+    # Log Level (DEBUG, INFO, WARNING, ERROR)
+    loglevel = "DEBUG"
+
+}
+
+raftPrototype {
+
+    # Election Timer Min (Seconds)
+    electionTimerIntervalMin = 2
+
+    # Election Timer Max (Seconds)
+    electionTimerIntervalMax = 3
+
+    # Heartbeat Timer Interval (Seconds)
+    heartbeatTimerInterval = 1
+
+    # Raft Nodes (Amount)
+    nodes = 5
+
+    # Crash Interval (auto simulate crash after some heartbeats in LEADER behavior)
+    crashIntervalHeartbeats = 10
+
+    # Sleep downtime (Seconds) (after simulated crash in SLEEP behavior)
+    sleepDowntime = 8
+
+}
+```
+
 #### What happens in normal run?
 
 tbd.
