@@ -21,7 +21,8 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
 
   "RaftService" should {
 
-    var temporaryFirstLeaderName: String = ""
+    var temporaryFirstLeaderName: String    = ""
+    var temporaryData: Map[String, String]  = Map.empty
 
     "elect only one leader" in {
 
@@ -40,9 +41,14 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
       data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
     }
 
-    "leader append data" in {
+    "append data in leader node" in {
 
-      val data: Vector[Either[WriteSuccess, IamNotTheLeader]] = raftService.appendData(key = "key1", value = "val1")
+      val newDataKey    = "key1"
+      val newDataValue  = "val1"
+
+      temporaryData = temporaryData + (newDataKey->newDataValue)
+
+      val data: Vector[Either[WriteSuccess, IamNotTheLeader]] = raftService.appendData(key = newDataKey, value = newDataValue)
 
       val localLeaderName = data.filter(_.isLeft).head match {
         case Left(left) => left.actorName
@@ -52,6 +58,18 @@ class RaftServiceTest extends BaseServiceTest with Configuration {
       localLeaderName       shouldBe temporaryFirstLeaderName
       data.count(_.isLeft)  shouldBe 1 //Only on leader
       data.count(_.isRight) shouldBe ( Config.nodes - 1 ) //Other nodes shouldBe follower
+    }
+
+    "has all nodes synchronized with new data" in {
+
+      freezeTest(seconds = Config.nodes * Config.heartbeatTimerInterval, loggerMessage = "Waiting for sync data")
+
+      val data: Vector[ActualData] = raftService.evaluateActualData
+
+      val uniqueHashCodes: Vector[Int] = data.map(_.data.hashCode()).distinct
+
+      uniqueHashCodes.size shouldBe 1
+      uniqueHashCodes.head shouldBe temporaryData.hashCode()
     }
 
     "simulate leader crash" in {
