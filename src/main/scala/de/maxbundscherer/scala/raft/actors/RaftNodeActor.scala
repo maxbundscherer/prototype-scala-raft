@@ -42,12 +42,15 @@ object RaftNodeActor {
   * --- Raft Node ----
   * ------------------
   *
-  * # 3 Behaviors (Finite-state machine)
+  * # 5 Behaviors (Finite-state machine / FSM)
   *
+  * !!! SEE PROJECT README !!!
+  *
+  * - (UNINITIALIZED)
   * - FOLLOWER (Default - after init)
-  * - CANDIDATE (after heartbeat timeout)
+  * - CANDIDATE (after election timeout)
   * - LEADER
-  * - SLEEP (after simulated crash in LEADER)
+  * - (SLEEP) (after simulated crash in LEADER)
   */
 class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     extends Actor
