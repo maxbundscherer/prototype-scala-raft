@@ -327,6 +327,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
   def sleepBehavior: Receive = {
 
     case SchedulerTrigger.Awake =>
+
       changeBehavior(fromBehavior = BehaviorEnum.SLEEP,
                      toBehavior = BehaviorEnum.FOLLOWER,
                      loggerMessage = s"Awake after ${Config.sleepDowntime} seconds downtime")

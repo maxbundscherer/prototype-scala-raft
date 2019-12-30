@@ -5,7 +5,6 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Await
-import scala.concurrent.duration._
 
 class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
                                     timeout: Timeout,
