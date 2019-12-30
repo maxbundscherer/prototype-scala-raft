@@ -181,6 +181,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
 
     case _: AppendData       => sender ! IamNotTheLeader(actorName = self.path.name)
 
+    case GetActualData =>
+
+      sender ! ActualData(data = state.data)
+
     case Heartbeat(lastHashCode) =>
 
       log.debug(s"Got heartbeat from (${sender().path.name})")
@@ -302,6 +306,10 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
       log.info(s"Leader is appending data ($key->$value) (newHashCode = ${state.lastHashCode})")
 
       sender ! WriteSuccess(actorName = self.path.name)
+
+    case GetActualData =>
+
+      sender ! ActualData(data = state.data)
 
     case IamNotConsistent =>
 

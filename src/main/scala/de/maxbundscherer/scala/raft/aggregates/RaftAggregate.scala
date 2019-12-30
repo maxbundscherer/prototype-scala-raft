@@ -16,6 +16,9 @@ object RaftAggregate {
   object      IamNotConsistent                        extends Response
   case class  OverrideData(data: Map[String, String]) extends Request
 
+  case class  GetActualData(data: Map[String, String]) extends Request
+  case class  ActualData(data: Map[String, String])    extends Response
+
   object      WhoIsLeader                         extends Request
   case class  IamTheLeader(actorName: String)     extends Response
   case class  IamNotTheLeader(actorName: String)  extends Response

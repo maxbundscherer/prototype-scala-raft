@@ -91,6 +91,20 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   }
 
   /**
+   * Ask each node: Provide your actual data
+   * @return Vector with ActualData
+   */
+  def evaluateActualData: Vector[ActualData] = {
+
+    nodes.map(node => {
+
+      Await.result(node._2 ? GetActualData, timeout.duration).asInstanceOf[ActualData]
+
+    }).toVector
+
+  }
+
+  /**
    * Terminates actor system
    */
   def terminate(): Future[Boolean] = actorSystem.terminate().map(_ => true)
