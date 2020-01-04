@@ -100,6 +100,107 @@ The ***integration-test*** is well documented - it's self explaining:
 
 - ``./src/test/scala/de/maxbundscherer/scala/raft/RaftServiceTest.scala``
 
+## Exciting (scala) stuff
+
+Concurrent programming in scala is usually done with akka actors. Akka actors is an actor model implementation for scala and java. Akka is developed/maintained by [Lightbend](https://www.lightbend.com/) (earlier called Typesafe).
+
+The program and business logic is divided into separated actors. Each of these actors has its own state (own protected memory) and can only communicate with other actors by immutable messages.
+
+![](./docImg/ActorModel.png)(Image source: https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html)
+
+### Akka Actors Example
+
+```scala
+package de.maxbundscherer.scala.raft.examples
+
+import akka.actor.{Actor, ActorLogging}
+
+class SimpleActor extends Actor with ActorLogging {
+  
+  override def receive: Receive = {
+
+    case data: String =>
+      
+      sender ! data + "-pong"
+
+    case any: Any =>
+      
+      log.error(s"Got unhandled message '$any'")
+      
+  }
+  
+}
+```
+
+In this example you see a very simple akka actor: The actor is waiting for string-messages and replies with a new string (``!`` is used for [fire-and-forget-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#fire-and-forget) / use ``?`` to use [ask-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#request-response-with-ask-from-outside-an-actor) instead).
+
+Non-string-messages are displayed by an error-logger.
+
+### Raft nodes as akka actors
+
+In this project raft nodes are implemented as an akka actor (``RaftNodeActor``) with finite-state machine (FSM) behavior (see description and image above).
+
+#### Finite-state machine (FSM) in akka
+
+You can define multiple behaviors in an akka actor - see example:
+
+```scala
+package de.maxbundscherer.scala.raft.examples
+
+import akka.actor.{Actor, ActorLogging}
+
+object SimpleFSMActor {
+  
+  //Initialize message/command
+  case class Initialize(state: Int)
+  
+}
+
+class SimpleFSMActor extends Actor with ActorLogging {
+
+  import SimpleFSMActor._
+  
+  //Actor mutable state
+  private var state = -1
+
+  //Initialized behavior 
+  def initialized: Receive = {
+
+    case any: Any => log.info(s"Got message '$any'")
+    
+  }
+
+  //Default behavior
+  override def receive: Receive = {
+
+    case Initialize(newState) =>
+
+      state = newState
+      context.become(initialized)
+
+    case any: Any => log.error(s"Not initialized '$any'")
+
+  }
+
+}
+```
+
+#### Service-Layer!?
+
+Classic akka actors are not type safety. To "simulate" type safety the service-layer (``RaftService``) was implemented. The service-layer is also used to spawn & initialize actors and to supervise the actor system - see examples:
+
+**Spawn akka actor**
+```scala
+actorSystem.actorOf(props = RaftNodeActor.props, name = "myRaftNode")
+```
+
+**Ask (type safety non-blocking request)**
+```scala
+def ping(): Future[Pong] = {
+  ( actorRef ? Ping() ).asInstanceOf[Future[Pong]]
+}
+```
+
 ## Talk about ...
 
 - ... enums in scala
