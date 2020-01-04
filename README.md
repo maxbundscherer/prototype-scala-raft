@@ -98,7 +98,7 @@ Data exchange (write data trough leader to followers) will be tested in test run
 
 The ***integration-test*** is well documented - it's self explaining:
 
-- ``./src/test/scala/de/maxbundscherer/scala/raft/RaftServiceTest``
+- ``./src/test/scala/de/maxbundscherer/scala/raft/RaftServiceTest.scala``
 
 ## Talk about ...
 
