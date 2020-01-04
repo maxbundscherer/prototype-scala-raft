@@ -208,21 +208,35 @@ tbd.
 
 (TODO: enums in scala)
 
-#### ``Configuration`` trait
+#### Trait ``Configuration``
 
-tbd.
+Scala traits are very similar to java's interfaces. Traits can also include implementation. Normal classes can be extended (inheritance) by multiple traits, but only extend from one abstract class. Traits support multiple inheritance.
 
-#### ``RaftScheduler`` trait
+In this project the trait ``Configuration`` with internal object (read-only-singleton) ``Config`` is used to pass user-config to program.
 
-tbd.
+The user-config is defined in the file ``application.conf`` and is loaded by a config-factory (see project dependencies).
 
-(TODO: difference between ``scheduleWithFixedDelay`` and ``scheduleAtFixedRate`` in akka)
+#### Trait ``RaftScheduler``
+
+The trait ``RaftScheduler`` is used to control raft-nodes timers in ``RaftNodeActor`` with the following function-calls:
+
+- ``stopElectionTimer()``: Used to stop electionTimer. This timer is used to get informed about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and to get informed about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
+- ``restartElectionTimer()``: Used to stop and start electionTimer.
+- ``stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer is used to get informed about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
+- ``restartHeartbeatTimer()``: Used to stop and start heartbeatTimer.
+- ``scheduleAwake()``: Used to trigger awake automatically after downtime in SLEEP behavior (``SchedulerTrigger.Awake``).
+
+Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNodeActor`` to stop and start timers dependent on the node behaviors. 
 
 #### Service Configurator Pattern
 
 tbd.
 
 (TODO: [Based on](https://www.usenix.org/legacy/publications/library/proceedings/coots97/full_papers/jain/jain.pdf))
+
+## Scala compared to go
+
+tbd.
 
 ## Prospects
 
