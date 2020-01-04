@@ -202,11 +202,9 @@ def ping(): Future[Pong] = {
 }
 ```
 
-### Aggregates
+#### Aggregates
 
-tbd.
-
-(TODO: enums in scala)
+The object (read-only-singleton) ``RaftAggregate`` includes all necessary classes and objects (actor messages) for ``RaftService``, ``RaftNodeActor`` and ``RaftScheduler``.
 
 #### Trait ``Configuration``
 
@@ -230,9 +228,12 @@ Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNo
 
 #### Service Configurator Pattern
 
-tbd.
+The program architecture is based on the [Service Configurator Pattern](https://www.usenix.org/legacy/publications/library/proceedings/coots97/full_papers/jain/jain.pdf).
 
-(TODO: [Based on](https://www.usenix.org/legacy/publications/library/proceedings/coots97/full_papers/jain/jain.pdf))
+The actor system & the services are started and configured in ...
+
+- ... object ``Main`` for normal run.
+- ... trait ``BaseServiceTest`` for test run.
 
 ## Scala compared to go
 
