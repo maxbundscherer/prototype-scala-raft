@@ -109,6 +109,34 @@ The program and business logic is divided into separated actors. Each of these a
 ![](./docImg/ActorModel.png)
 (Image source: https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html)
 
+The ``RaftNodeActor`` has the following state implemented:
+
+```scala
+/**
+    * Internal (mutable) actor state
+    * @param neighbours Vector with another actors
+    * @param electionTimer Cancellable for timer (used in FOLLOWER and CANDIDATE behavior)
+    * @param heartbeatTimer Cancellable for timer (used in LEADER behavior)
+    * @param alreadyVoted Boolean (has already voted in FOLLOWER behavior)
+    * @param voteCounter Int (counter in CANDIDATE behavior)
+    * @param majority Int (calculated majority - set up in init)
+    * @param heartbeatCounter Int (auto simulate crash after some heartbeats in LEADER behavior)
+   *  @param data Map (String->String) (used in FOLLOWER and LEADER behavior)
+   *  @param lastHashCode Int (last hashcode from data) (used in FOLLOWER and LEADER behavior)
+    */
+  case class NodeState(
+      var neighbours            : Vector[ActorRef]    = Vector.empty,
+      var electionTimer         : Option[Cancellable] = None,
+      var heartbeatTimer        : Option[Cancellable] = None,
+      var alreadyVoted          : Boolean             = false,
+      var voteCounter           : Int                 = 0,
+      var majority              : Int                 = -1,
+      var heartbeatCounter      : Int                 = 0,
+      var data                  : Map[String, String] = Map.empty,
+      var lastHashCode          : Int                 = -1,
+  )
+```
+
 ### Akka Actors Example
 
 ```scala
@@ -218,13 +246,62 @@ The user-config is defined in the file ``application.conf`` and is loaded by a c
 
 The trait ``RaftScheduler`` is used to control raft-nodes timers in ``RaftNodeActor`` with the following function-calls:
 
-- ``stopElectionTimer()``: Used to stop electionTimer. This timer is used to get informed about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and to get informed about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
-- ``restartElectionTimer()``: Used to stop and start electionTimer.
-- ``stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer is used to get informed about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
-- ``restartHeartbeatTimer()``: Used to stop and start heartbeatTimer.
-- ``scheduleAwake()``: Used to trigger awake automatically after downtime in SLEEP behavior (``SchedulerTrigger.Awake``).
+- ``def stopElectionTimer()``: Used to stop electionTimer. This timer is used to get informed about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and to get informed about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
+- ``def restartElectionTimer()``: Used to stop and start electionTimer.
+- ``def stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer is used to get informed about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
+- ``def restartHeartbeatTimer()``: Used to stop and start heartbeatTimer.
+- ``def scheduleAwake()``: Used to trigger awake automatically after downtime in SLEEP behavior (``SchedulerTrigger.Awake``).
 
-Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNodeActor`` to stop and start timers dependent on the node behaviors. 
+Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNodeActor`` to stop and start timers dependent on the node behaviors:
+
+```scala
+/**
+   * Before change behavior
+   */
+val newBehavior: Receive = toBehavior match {
+
+  [...]
+  
+  case BehaviorEnum.FOLLOWER =>
+    restartElectionTimer()
+    stopHeartbeatTimer()
+    followerBehavior
+
+  case BehaviorEnum.CANDIDATE =>
+    restartElectionTimer()
+    stopHeartbeatTimer()
+    candidateBehavior
+
+  [...]
+
+}
+```
+
+```scala
+/**
+   * After change behavior
+   */
+toBehavior match {
+      
+  [...]
+
+  case BehaviorEnum.SLEEP => scheduleAwake()
+      
+  [...]
+
+}
+```
+
+```scala
+/**
+   * In followerBehavior
+   */
+case Heartbeat(lastHashCode) =>
+      
+      [...]
+
+      restartElectionTimer()
+```
 
 #### Service Configurator Pattern
 
