@@ -107,7 +107,8 @@ Concurrent programming in scala is usually done with akka actors. Akka actors is
 The program and business logic is divided into separated actors. Each of these actors has its own state (own protected memory) and can only communicate with other actors by immutable messages.
 
 ![](./docImg/ActorModel.png)
-(Image source: https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html)
+
+([Image source](https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html))
 
 The ``RaftNodeActor`` has the following state implemented:
 
@@ -314,7 +315,21 @@ The actor system & the services are started and configured in ...
 
 ## Scala compared to go
 
-tbd.
+- Data-types in scala and go are strong, static, inferred and structural typed.
+- Scala intends to multicore architectures and brings functional programming & object oriented programming together. To improve code quality, you should not mix both concepts.
+- Go intends to multicore architectures too and is an alternative to the programming language c.
+- Learning scala is long and sometimes quite involved, because firstly you should have be familiar with the concept of functional programming and scala has lot of complex concepts in the basic-language implemented.
+- Learning go is not too long, because go is build on easy & confides concepts (for example the concept of object oriented programming).
+- Scala is usually running in the java-virtual-machine (JVM) and can interact with java-libraries. You can compile [scala native](https://github.com/scala-native/scala-native), but it is unusually.
+- Go is running native (is not compiled to byte-code) and can interact with c-libraries.
+
+My personal opinion:
+
+- Scala is more empowering and you need less code.
+- Go is faster and very effective but feels sometimes repetitive and very mechanic.
+- You cant compare both languages on the same level because the programming languages are used for different stacks.
+- Scala is used for high-level cloud-applications (for example [Apache Spark](https://spark.apache.org/)).
+- Go is used for low-level applications to make high-level-applications possible (for example [Docker](https://www.docker.com/)).
 
 ## Prospects
 
