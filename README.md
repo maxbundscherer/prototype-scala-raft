@@ -323,7 +323,7 @@ The actor system & the services are started and configured in ...
 - Scala is usually running in the java-virtual-machine (JVM) and can interact with java-libraries. You can compile [scala native](https://github.com/scala-native/scala-native), but it is unusually.
 - Go is running native (is not compiled to byte-code) and can interact with c-libraries.
 
-My personal opinion:
+### My personal opinion:
 
 - Scala is more empowering and you need less code.
 - Go is faster and very effective but feels sometimes repetitive and very mechanic.
@@ -336,3 +336,5 @@ My personal opinion:
 - This implementation is a prototype and should be not used in production.
 - You can use [akka cluster](https://doc.akka.io/docs/akka/current/cluster-usage.html) to run this implementation on network and different machines. You have to modify the ``RaftService`` to spawn actors in cluster.
 - Dont use java serializer in production. Its very slow and not secure. Use [protobuf](https://github.com/protocolbuffers/protobuf) instead.
+
+![](./docImg/logos.png)
