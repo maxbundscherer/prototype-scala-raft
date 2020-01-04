@@ -69,7 +69,7 @@ class RaftService(numberNodes: Int)(implicit actorSystem: ActorSystem,
   }
 
   /**
-   * Append data (only leader is allowed to write data - synchronised by heartbeat from leader with followers - blocking)
+   * Append data (only leader is allowed to write data - synchronized by heartbeat from leader with followers - blocking)
    * @param key String
    * @param value String
    * @return Vector with Either [Left = WriteSuccess, Right = IamNotTheLeader]

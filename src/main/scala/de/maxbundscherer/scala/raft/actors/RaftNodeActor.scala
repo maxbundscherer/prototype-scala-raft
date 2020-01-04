@@ -82,7 +82,7 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     log.info(s"Change behavior from '$fromBehavior' to '$toBehavior' ($loggerMessage)")
 
     /**
-      * Before change behavior
+      * Before change of behavior
       */
     val newBehavior: Receive = toBehavior match {
 
@@ -114,12 +114,12 @@ class RaftNodeActor()(implicit val executionContext: ExecutionContext)
     }
 
     /**
-      * Change behavior
+      * Change of behavior
       */
     context.become(newBehavior)
 
     /**
-      * After change behavior
+      * After change of behavior
       */
     toBehavior match {
 

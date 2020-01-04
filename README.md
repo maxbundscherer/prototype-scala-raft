@@ -23,8 +23,8 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
 ### Used dependencies
 
-- [akka actors](https://doc.akka.io/docs/akka/current/actors.html): Actor model implementation (scala/java).
-- [scalactic](http://www.scalactic.org/): Test kit for scala.
+- [akka actors](https://doc.akka.io/docs/akka/current/actors.html): Actor model implementation (Scala/Java).
+- [scalactic](http://www.scalactic.org/): Test kit for Scala.
 - [sbt-jacoco](https://github.com/sbt/sbt-jacoco): SBT plugin for generating coverage-reports.
 
 ### What is implemented?
@@ -32,10 +32,10 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 - RaftNode as Finite-state machine (**FSM**) with **key-value storage**
 
     - ``(Uninitialized)``: Not initialized
-    - ``Follower`` (Default behavior): Waiting for heartbeats from leader-node with hashCode from data. If local stored data's hashCode is not equal to leader-node data's hashCode the node synchronizes with leader-node. If there is no heartbeat from leader-node in configured randomized interval received, the node is changing to candidate-behavior. 
-    - ``Candidate``: The candidate requests votes from all followers and votes for himself. If he gets the majority in configured interval, he becomes the leader. If not he becomes follower again.
+    - ``Follower`` (Default behavior): Waiting for heartbeats from leader-node with hashCode from data. If local stored data's hashCode is not equal to leader-node data's hashCode, the node will synchronize with leader-node. If there is no heartbeat from leader-node in configured randomized interval received, the node will change to candidate-behavior. 
+    - ``Candidate``: The candidate requests votes from all followers and votes for himself. If he wins the election in configured interval, he will become the leader. If not, he will become follower again. For winning the election the node requires the majority of votes.
     - ``Leader``: The leader is sending continuous heartbeats to all followers with hashCode from his stored data. The leader is the only node that is allowed to write data.
-    - ``(Sleep)``: Is used for simulating leader-crashes (triggered by crashIntervalHeartbeats in normal run or by SimulateLeaderCrash in test run). In this behavior the node does not respond to non-debug-messages. After configured downtime the node is changing to follower-behavior.
+    - ``(Sleep)``: Is used for simulating leader-crashes (triggered by crashIntervalHeartbeats in normal run or by SimulateLeaderCrash in test run). In this behavior, the node does not respond to non-debug-messages. After configured downtime, the node changes to follower-behavior.
     
 ![](./docImg/raftFsm.png)
 
@@ -79,9 +79,11 @@ raftPrototype {
 
 ### What happens in normal run?
 
-All nodes starts in follower behavior (some of them will change their behavior to candidate) and will elect the first leader. After some (configured) heartbeats from leader, the leader is simulating crash and is "sleeping" for configured downtime. The next leader will be elected.
+All nodes start in follower behavior (some of them will change their behavior to candidate) and elect the first leader.
 
-This happens again and again and again... till you stop the program or the earth is going to overheat ;)
+After some (configured) heartbeats from leader, the leader is simulating its crash and is "sleeping" for configured downtime. The next leader will be elected.
+
+This happens again and again and again... until you stop the program or the earth is going to overheat. 😉
 
 Data exchange (write data trough leader to followers) will be tested in test run (see below).
 
@@ -96,13 +98,13 @@ Data exchange (write data trough leader to followers) will be tested in test run
 7. Get back data from all nodes (all nodes should have same data)
 
 
-The ***integration-test*** is well documented - it's self explaining:
+The ***integration-test*** is well documented - it is self explaining:
 
 - ``./src/test/scala/de/maxbundscherer/scala/raft/RaftServiceTest.scala``
 
 ## Exciting (scala) stuff
 
-Concurrent programming in scala is usually done with akka actors. Akka actors is an actor model implementation for scala and java. Akka is developed/maintained by [Lightbend](https://www.lightbend.com/) (earlier called Typesafe).
+Concurrent programming in Scala is usually done with akka actors. Akka actors is an actor model implementation for Scala and Java. Akka is developed/maintained by [Lightbend](https://www.lightbend.com/) (earlier called Typesafe).
 
 The program and business logic is divided into separated actors. Each of these actors has its own state (own protected memory) and can only communicate with other actors by immutable messages.
 
@@ -162,13 +164,13 @@ class SimpleActor extends Actor with ActorLogging {
 }
 ```
 
-In this example you see a very simple akka actor: The actor is waiting for string-messages and replies with a new string (``!`` is used for [fire-and-forget-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#fire-and-forget) / use ``?`` to use [ask-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#request-response-with-ask-from-outside-an-actor) instead).
+In this example, you can see a very simple akka actor: The actor is waiting for string-messages and replies with a new string (``!`` is used for [fire-and-forget-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#fire-and-forget) / use ``?`` to use [ask-pattern](https://doc.akka.io/docs/akka/current/typed/interaction-patterns.html#request-response-with-ask-from-outside-an-actor) instead).
 
 Non-string-messages are displayed by an error-logger.
 
 ### Raft nodes as akka actors
 
-In this project raft nodes are implemented as an akka actor (``RaftNodeActor``) with finite-state machine (FSM) behavior (see description and image above).
+In this project, raft nodes are implemented as an akka actor (``RaftNodeActor``) with finite-state machine (FSM) behavior (see description and image above).
 
 #### Finite-state machine (FSM) in akka
 
@@ -217,7 +219,7 @@ class SimpleFSMActor extends Actor with ActorLogging {
 
 #### Service-Layer
 
-Classic akka actors are not type safety. To "simulate" type safety the service-layer (``RaftService``) was implemented. The service-layer is also used to spawn & initialize actors and to supervise the actor system - see examples:
+Classic akka actors are not type safety. To "simulate" type safety, the service-layer (``RaftService``) was implemented. The service-layer is also used to spawn & initialize actors and to supervise the actor system - see examples:
 
 - Spawn akka actor:
 ```scala
@@ -237,7 +239,7 @@ The object (read-only-singleton) ``RaftAggregate`` includes all necessary classe
 
 #### Trait ``Configuration``
 
-Scala traits are very similar to java's interfaces. Traits can also include implementation. Normal classes can be extended (inheritance) by multiple traits, but only extend from one abstract class. Traits support multiple inheritance.
+Scala traits are very similar to Java's interfaces. Traits can also include implementation. Normal classes can be extended (inheritance) by multiple traits, but only extend from one abstract class. Traits support multiple inheritance.
 
 In this project the trait ``Configuration`` with internal object (read-only-singleton) ``Config`` is used to pass user-config to program.
 
@@ -247,17 +249,17 @@ The user-config is defined in the file ``application.conf`` and is loaded by a c
 
 The trait ``RaftScheduler`` is used to control raft-nodes timers in ``RaftNodeActor`` with the following function-calls:
 
-- ``def stopElectionTimer()``: Used to stop electionTimer. This timer is used to get informed about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and to get informed about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
+- ``def stopElectionTimer()``: Used to stop electionTimer. This timer informs about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
 - ``def restartElectionTimer()``: Used to stop and start electionTimer.
-- ``def stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer is used to get informed about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
+- ``def stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer informs about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
 - ``def restartHeartbeatTimer()``: Used to stop and start heartbeatTimer.
-- ``def scheduleAwake()``: Used to trigger awake automatically after downtime in SLEEP behavior (``SchedulerTrigger.Awake``).
+- ``def scheduleAwake()``: Used to trigger awakening automatically after downtime in SLEEP behavior (``SchedulerTrigger.Awake``). Awakening means: The node changes to follower-behavior.
 
-Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNodeActor`` to stop and start timers dependent on the node behaviors:
+Timers are controlled by ``changeBehavior`` and ``followerBehavior`` in ``RaftNodeActor`` to stop and start timers dependent on the nodes' behavior:
 
 ```scala
 /**
-   * Before change behavior
+   * Before change of behavior
    */
 val newBehavior: Receive = toBehavior match {
 
@@ -280,7 +282,7 @@ val newBehavior: Receive = toBehavior match {
 
 ```scala
 /**
-   * After change behavior
+   * After change of behavior
    */
 toBehavior match {
       
@@ -313,28 +315,29 @@ The actor system & the services are started and configured in ...
 - ... object ``Main`` for normal run.
 - ... trait ``BaseServiceTest`` for test run.
 
-## Scala compared to go
+## Scala compared to Go
 
-- Data-types in scala and go are strong, static, inferred and structural typed.
+- Data-types in Scala and Go are strong, static, inferred and structural typed.
 - Scala intends to multicore architectures and brings functional programming & object oriented programming together. To improve code quality, you should not mix both concepts.
-- Go intends to multicore architectures too and is an alternative to the programming language c.
-- Learning scala is long and sometimes quite involved, because firstly you should have be familiar with the concept of functional programming and scala has lot of complex concepts in the basic-language implemented.
-- Learning go is not too long, because go is build on easy & confides concepts (for example the concept of object oriented programming).
-- Scala is usually running in the java-virtual-machine (JVM) and can interact with java-libraries. You can compile [scala native](https://github.com/scala-native/scala-native), but it is unusually.
-- Go is running native (is not compiled to byte-code) and can interact with c-libraries.
+- Go intends to multicore architectures, too, and is an alternative to the programming language C.
+- Learning Scala is time-consuming and sometimes quite involved because of the necessity to be familiar with the concept of functional programming and the huge amounts of complex concepts in the basic-language implemented.
+- Learning Go is not so time-consuming, because Go is built on easy & familiar concepts (for example the concept of object oriented programming).
+- Scala is usually running in the Java-virtual-machine (JVM) and can interact with Java-libraries. Compiling Scala [native](https://github.com/scala-native/scala-native) is possible, but unusual.
+- Go is running native (is not compiled to byte-code) and can interact with C-libraries.
 
 ### My personal opinion:
 
 - Scala is more empowering and you need less code.
-- Go is faster and very effective but feels sometimes repetitive and very mechanic.
-- **You cant compare both languages on the same level because the programming languages are used for different stacks.**
+- Go runs faster and very effective but sometimes feels repetitive and very mechanic.
+- **You cannot compare both languages on the same level because the programming languages are used for different stacks.**
 - Scala is used for high-level cloud-applications (for example [Apache Spark](https://spark.apache.org/)).
 - Go is used for low-level applications to make high-level-applications possible (for example [Docker](https://www.docker.com/)).
 
 ## Prospects
 
-- This implementation is a prototype and should be not used in production.
+- This implementation is a prototype and should not be used in production.
 - You can use [akka cluster](https://doc.akka.io/docs/akka/current/cluster-usage.html) to run this implementation on network and different machines. You have to modify the ``RaftService`` to spawn actors in cluster.
-- Dont use java serializer in production. Its very slow and not secure. Use [protobuf](https://github.com/protocolbuffers/protobuf) instead.
+- Do not use Java serializer in production. It is slow and not secure. Use [Protobuf](https://github.com/protocolbuffers/protobuf) instead.
+
 
 ![](./docImg/logos.png)
