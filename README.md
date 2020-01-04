@@ -190,12 +190,12 @@ class SimpleFSMActor extends Actor with ActorLogging {
 
 Classic akka actors are not type safety. To "simulate" type safety the service-layer (``RaftService``) was implemented. The service-layer is also used to spawn & initialize actors and to supervise the actor system - see examples:
 
-***Spawn akka actor***
+- Spawn akka actor:
 ```scala
 actorSystem.actorOf(props = RaftNodeActor.props, name = "myRaftNode")
 ```
 
-***Ask (type safety non-blocking request)***
+- Ask (type safety non-blocking request):
 ```scala
 def ping(): Future[Pong] = {
   ( actorRef ? Ping() ).asInstanceOf[Future[Pong]]
@@ -217,6 +217,12 @@ tbd.
 tbd.
 
 (TODO: difference between ``scheduleWithFixedDelay`` and ``scheduleAtFixedRate`` in akka)
+
+#### Service Configurator Pattern
+
+tbd.
+
+(TODO: [Based on](https://www.usenix.org/legacy/publications/library/proceedings/coots97/full_papers/jain/jain.pdf))
 
 ## Prospects
 
