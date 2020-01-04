@@ -1,6 +1,6 @@
 # (Prototype) Raft Consensus Algorithm in Scala
 
-**Protoype Raft Consensus Algorithm in Scala**
+**Protoype [Raft Consensus](https://raft.github.io/raft.pdf) Algorithm in Scala**
 
 ![](./docImg/logos.png)
 
@@ -33,7 +33,7 @@ Author: [Maximilian Bundscherer](https://bundscherer-online.de)
 
     - ``(Uninitialized)``: Not initialized
     - ``Follower`` (Default behavior): Waiting for heartbeats from leader-node with hashCode from data. If local stored data's hashCode is not equal to leader-node data's hashCode the node synchronizes with leader-node. If there is no heartbeat from leader-node in configured randomized interval received, the node is changing to candidate-behavior. 
-    - ``Candidate``: The candidate requests votes from all followers and votes for himself. If he gets the majority in configured interval, he become the leader. If not he become follower again.
+    - ``Candidate``: The candidate requests votes from all followers and votes for himself. If he gets the majority in configured interval, he becomes the leader. If not he becomes follower again.
     - ``Leader``: The leader is sending continuous heartbeats to all followers with hashCode from his stored data. The leader is the only node that is allowed to write data.
     - ``(Sleep)``: Is used for simulating leader-crashes (triggered by crashIntervalHeartbeats in normal run or by SimulateLeaderCrash in test run). In this behavior the node does not respond to non-debug-messages. After configured downtime the node is changing to follower-behavior.
     
@@ -83,17 +83,17 @@ All nodes starts in follower behavior (some of them will change their behavior t
 
 This happens again and again and again... till you stop the program or the earth is going to overheat ;)
 
-Data exchange (write data trough leader to followers) will be tested in test run.
+Data exchange (write data trough leader to followers) will be tested in test run (see below).
 
 ### What happens in test run?
 
-1. Leader election
-2. Write data trough leader to followers
-3. Get back data from all nodes
-4. Simulate leader crash
-5. New leader election
-6. Write data trough leader to followers
-7. Get back data from all nodes
+1. Leader election (after init nodes)
+2. Write data trough leader to followers (first write data to leader and replicate data to followers)
+3. Get back data from all nodes (all nodes should have same data)
+4. Simulate leader crash (triggered in test)
+5. New leader election (old leader is gone)
+6. Write data trough leader to followers (first write data to leader and replicate data to followers)
+7. Get back data from all nodes (all nodes should have same data)
 
 
 The ***integration-test*** is well documented - it's self explaining:
