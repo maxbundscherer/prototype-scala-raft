@@ -106,7 +106,8 @@ Concurrent programming in scala is usually done with akka actors. Akka actors is
 
 The program and business logic is divided into separated actors. Each of these actors has its own state (own protected memory) and can only communicate with other actors by immutable messages.
 
-![](./docImg/ActorModel.png)(Image source: https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html)
+![](./docImg/ActorModel.png)
+(Image source: https://blog.scottlogic.com/2014/08/15/using-akka-and-scala-to-render-a-mandelbrot-set.html)
 
 ### Akka Actors Example
 
@@ -185,25 +186,40 @@ class SimpleFSMActor extends Actor with ActorLogging {
 }
 ```
 
-#### Service-Layer!?
+#### Service-Layer
 
 Classic akka actors are not type safety. To "simulate" type safety the service-layer (``RaftService``) was implemented. The service-layer is also used to spawn & initialize actors and to supervise the actor system - see examples:
 
-**Spawn akka actor**
+***Spawn akka actor***
 ```scala
 actorSystem.actorOf(props = RaftNodeActor.props, name = "myRaftNode")
 ```
 
-**Ask (type safety non-blocking request)**
+***Ask (type safety non-blocking request)***
 ```scala
 def ping(): Future[Pong] = {
   ( actorRef ? Ping() ).asInstanceOf[Future[Pong]]
 }
 ```
 
-## Talk about ...
+### Aggregates
 
-- ... enums in scala
-- ... typed akka actors (and service layer alternative)
-- ... fsm in akka actor
-- ... difference between ``scheduleWithFixedDelay`` and ``scheduleAtFixedRate`` in akka
+tbd.
+
+(TODO: enums in scala)
+
+#### ``Configuration`` trait
+
+tbd.
+
+#### ``RaftScheduler`` trait
+
+tbd.
+
+(TODO: difference between ``scheduleWithFixedDelay`` and ``scheduleAtFixedRate`` in akka)
+
+## Prospects
+
+tbd.
+
+(TODO: Akka cluster / Disable auto test in normal run / java serializer in production)
