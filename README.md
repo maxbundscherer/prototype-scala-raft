@@ -327,12 +327,12 @@ My personal opinion:
 
 - Scala is more empowering and you need less code.
 - Go is faster and very effective but feels sometimes repetitive and very mechanic.
-- You cant compare both languages on the same level because the programming languages are used for different stacks.
+- **You cant compare both languages on the same level because the programming languages are used for different stacks.**
 - Scala is used for high-level cloud-applications (for example [Apache Spark](https://spark.apache.org/)).
 - Go is used for low-level applications to make high-level-applications possible (for example [Docker](https://www.docker.com/)).
 
 ## Prospects
 
-tbd.
-
-(TODO: Akka cluster / Disable auto test in normal run / java serializer in production)
+- This implementation is a prototype and should be not used in production.
+- You can use [akka cluster](https://doc.akka.io/docs/akka/current/cluster-usage.html) to run this implementation on network and different machines. You have to modify the ``RaftService`` to spawn actors in cluster.
+- Dont use java serializer in production. Its very slow and not secure. Use [protobuf](https://github.com/protocolbuffers/protobuf) instead.
