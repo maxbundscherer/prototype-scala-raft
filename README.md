@@ -249,7 +249,7 @@ The user-config is defined in the file ``application.conf`` and is loaded by a c
 
 The trait ``RaftScheduler`` is used to control raft-nodes timers in ``RaftNodeActor`` with the following function-calls:
 
-- ``def stopElectionTimer()``: Used to stop electionTimer. This timer informs about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and about "vote-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
+- ``def stopElectionTimer()``: Used to stop electionTimer. This timer informs about "heartbeat-timeout" (``SchedulerTrigger.ElectionTimeout``) in FOLLOWER behavior and about "election-timeout" (``SchedulerTrigger.ElectionTimeout``) in CANDIDATE behavior.
 - ``def restartElectionTimer()``: Used to stop and start electionTimer.
 - ``def stopHeartbeatTimer()``: Used to stop heartbeatTimer. This timer informs about "send-heartbeat to all followers" (``SchedulerTrigger.Heartbeat``) in LEADER behavior.
 - ``def restartHeartbeatTimer()``: Used to stop and start heartbeatTimer.
