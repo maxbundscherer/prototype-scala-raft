@@ -325,6 +325,65 @@ The actor system & the services are started and configured in ...
 - Scala is usually running in the Java-virtual-machine (JVM) and can interact with Java-libraries. Compiling Scala [native](https://github.com/scala-native/scala-native) is possible, but unusual.
 - Go is running native (is not compiled to byte-code) and can interact with C-libraries.
 
+### Go concurrency
+
+The language provides multiple ways:
+
+- Concurrent execution ([goroutines](https://golangbot.com/goroutines/))
+- Synchronization and messaging ([channels](https://www.geeksforgeeks.org/channel-in-golang/) - very similar to akka actors - Buffered Channels - FIFO)
+- Multi-way concurrent control ([select](https://gobyexample.com/select))
+- Low level blocking primitives ([locks/sync](https://golang.org/pkg/sync/))
+
+### Scala concurrency
+
+In Scala ``ExecutionContext`` (default is ``ExecutionContext.global``) is responsible for executing computations. The default ``ExecutionContext`` is a global static thread pool and it is based on [Java's Fork/Join](https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html). For example, you can set:
+
+- ``scala.concurrent.context.minThreads``
+- ``scala.concurrent.context.maxThreads``
+
+You can also use multiple ``ExecutionContext``s in your application (or server-cluster).
+
+Concurrent programming in Scala is usually done with akka actors. See "Exciting (scala) stuff" above.
+
+You can also use:
+
+- Scala Futures
+
+```scala
+val future = Future {
+  getData()
+}
+
+future.onComplete {
+  case Success(data) => println(s"Got $data")
+  case Failure(exception) => println(s"Got failure $exception")
+}
+```
+
+- Threads and Thread Pools from Java (unusually)
+
+```scala
+// This is unusually. Better use akka actors.
+
+class ExampleProcessor extends Thread {
+  override def run() {
+    while(true) {
+      val examples = Examples.getExamples()
+      examples.foreach{ example =>
+        process(example)
+      }
+    }
+  }
+}
+
+//Start new thread
+val thread = new ExampleProcessor()
+thread.start()
+
+//Wait for finishing
+thread.join()
+```
+
 ### My personal opinion:
 
 - Scala is more empowering and you need less code.
