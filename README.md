@@ -388,9 +388,9 @@ thread.join()
 
 - Scala is more empowering and you need less code.
 - Go runs faster and very effective but sometimes feels repetitive and very mechanic.
-- **You cannot compare both languages on the same level because the programming languages are used for different stacks.**
 - Scala is used for high-level cloud-applications (for example [Apache Spark](https://spark.apache.org/)).
 - Go is used for low-level applications to make high-level-applications possible (for example [Docker](https://www.docker.com/)).
+- **Comparing both languages is quite inconclusive because of their different fields of application.**
 
 ## Prospects
 
