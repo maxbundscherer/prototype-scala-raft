@@ -327,7 +327,7 @@ The actor system & the services are started and configured in ...
 
 ### Go concurrency
 
-The language provides multiple ways:
+The language provides multiple possibilities:
 
 - Concurrent execution ([goroutines](https://golangbot.com/goroutines/))
 - Synchronization and messaging ([channels](https://www.geeksforgeeks.org/channel-in-golang/) - very similar to akka actors - Buffered Channels - FIFO)
@@ -336,7 +336,7 @@ The language provides multiple ways:
 
 ### Scala concurrency
 
-In Scala ``ExecutionContext`` (default is ``ExecutionContext.global``) is responsible for executing computations. The default ``ExecutionContext`` is a global static thread pool and it is based on [Java's Fork/Join](https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html). For example, you can set:
+In Scala ``ExecutionContext`` (default is ``ExecutionContext.global``) is responsible for executing computations. The default ``ExecutionContext`` is a global static thread pool and is based on [Java's Fork/Join](https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html). For example, you can set:
 
 - ``scala.concurrent.context.minThreads``
 - ``scala.concurrent.context.maxThreads``
